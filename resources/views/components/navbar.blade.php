@@ -52,9 +52,13 @@
 
                         <ul class="py-2">
 
-                            <li class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">Category 1</li>
-                            <li class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">Category 2</li>
-                            <li class="block px-4 py-2 hover:bg-gray-100 cursor-pointer">Category 3</li>
+                            @foreach ($categories as $category)
+                                <li>
+                                    <a href="{{ route('categories.show', $category->slug) }}" class="block px-4 py-2 hover:bg-gray-100">
+                                        {{ $category->name }}
+                                    </a>
+                                </li>
+                            @endforeach
 
                         </ul>
                     </div>
