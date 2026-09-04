@@ -54,7 +54,8 @@
 
                             @foreach ($categories as $category)
                                 <li>
-                                    <a href="{{ route('categories.show', $category->slug) }}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <a href="{{ route('categories.show', $category->slug) }}"
+                                        class="block px-4 py-2 hover:bg-gray-100">
                                         {{ $category->name }}
                                     </a>
                                 </li>
@@ -376,14 +377,21 @@
     <div class="flex items-center h-10 px-5 lg:px-8 gap-7 bg-[#232f3e] text-sm font-medium">
 
         <!-- All -->
-        <a href="#"
-            class="flex items-center gap-2 h-9 px-2 border border-transparent hover:border-white rounded-sm">
+        <div class="text-white">
+            <div class="flex items-center h-full px-6">
 
-            <i class="fa-solid fa-bars text-base"></i>
+                <!-- Menu Button -->
+                <button id="menuButton"
+                    class="flex items-center gap-2 px-3 py-2
+                   border border-transparent hover:border-white rounded h-9">
+                    <i class="fa-solid fa-bars"></i>
+                    <span>All</span>
+                </button>
 
-            <span>All</span>
+                <x-sidebar :categories="$categories" />
 
-        </a>
+            </div>
+        </div>
 
 
         <!-- Today's Deals -->
@@ -410,14 +418,6 @@
         </a>
 
 
-        <!-- Categories -->
-        <a href="#" class="flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
-
-            Categories
-
-        </a>
-
-
         <!-- Today's Offers -->
         <a href="#"
             class="hidden md:flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
@@ -438,3 +438,7 @@
     </div>
 
 </header>
+
+<script>
+    const [open, setOpen] = useState(true);
+</script>

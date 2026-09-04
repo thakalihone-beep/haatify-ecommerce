@@ -11,11 +11,11 @@ class CategoryController extends Controller
         $categories = Category::where('status', 'active')
             ->get();
 
-        return view('category.index', compact('categories'));
+        return view('frontend.category.index', compact('categories'));
     }
 
     public function show(Category $category)
     {
-        return view('category.show', compact('category'));
+        return view('frontend.category.show', compact('category'));
     }
 }
