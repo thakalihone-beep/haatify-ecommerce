@@ -42,20 +42,3 @@
 </aside>
 
 
-<script>
-    const menuButton = document.getElementById('menuButton');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-
-    // Open sidebar
-    menuButton.addEventListener('click', function() {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-    });
-
-    // Close sidebar when clicking outside
-    overlay.addEventListener('click', function() {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-    });
-</script>

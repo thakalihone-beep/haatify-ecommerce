@@ -20,7 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        view()->composer('components.navbar', function ($view): void {
+        view()->composer([
+            'components.navbar',
+            'components.secondary-navbar',
+            'components.sidebar',
+        ], function ($view): void {
             $view->with('categories', Category::where('status', 'active')->get());
         });
     }

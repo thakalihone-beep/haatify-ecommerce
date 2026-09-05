@@ -24,19 +24,18 @@
         rel="stylesheet"
     >
 
-    {{-- Main CSS --}}
-    <link rel="stylesheet" href="{{ asset('frontend/main.css') }}">
+    {{-- Main CSS and JavaScript --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- Page-specific styles --}}
     @stack('styles')
 
-    {{-- Tailwind css --}}
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
 
     <x-navbar />
+    <x-secondary-navbar />
 
     <main>
         @yield('content')
@@ -46,6 +45,7 @@
 
     {{-- Page-specific scripts --}}
     @stack('scripts')
+
 
 </body>
 </html>
