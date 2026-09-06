@@ -1,4 +1,4 @@
 @extends('layouts.app')
 @section('content')
-	<x-hero />
+	<x-card-slider :categories="$categories" />
 @endsection
