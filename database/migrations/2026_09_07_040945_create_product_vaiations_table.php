@@ -13,6 +13,26 @@ return new class extends Migration
     {
         Schema::create('product_vaiations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->string('sku')->unique();
+
+            $table->json('attributes');
+
+            $table->decimal('price', 10, 2)->nullable();
+
+            $table->decimal('discount_price', 10, 2)->nullable();
+
+            $table->unsignedInteger('stock_qty')->default(0);
+
+            $table->string('image')->nullable();
+
+            $table->enum('status', [
+                'active',
+                'inactive'
+            ])->default('active');
             $table->timestamps();
         });
     }
