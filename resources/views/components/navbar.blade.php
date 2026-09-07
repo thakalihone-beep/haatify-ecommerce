@@ -222,9 +222,12 @@
 
             <!-- Account -->
             <div class="relative group">
+
                 <!-- Account Button -->
                 <div
-                    class="flex flex-col justify-center h-12 px-3 border border-transparent hover:border-white rounded-sm cursor-pointer whitespace-nowrap">
+                    class="flex flex-col justify-center h-12 px-3
+               border border-transparent hover:border-white
+               rounded-sm cursor-pointer whitespace-nowrap">
 
                     <button type="button" class="flex flex-col justify-center items-start h-full">
 
@@ -233,15 +236,18 @@
                         </span>
 
                         <span class="flex items-center text-sm font-bold leading-tight mt-1">
-                            Account & Lists
+                            Account
                             <i class="fa-solid fa-caret-down text-[11px] ml-1"></i>
                         </span>
 
                     </button>
 
-                    <!-- Dropdown -->
+
+                    <!-- ================= DROPDOWN ================= -->
                     <div
-                        class="absolute right-0 top-full mt-1 hidden group-hover:block w-[420px] bg-white text-gray-900 rounded-md shadow-2xl border border-gray-200 z-50">
+                        class="absolute right-0 top-full mt-1 hidden group-hover:block
+                   w-[320px] bg-white text-gray-900
+                   rounded-md shadow-2xl border border-gray-200 z-50">
 
                         <!-- Arrow -->
                         <div
@@ -251,92 +257,121 @@
                        rotate-45">
                         </div>
 
-                        <!-- Sign In Section -->
-                        <div class="relative bg-gray-50 border-b border-gray-200 px-6 py-4 text-center">
 
-                            <button type="button"
-                                class="w-48 bg-orange-400 hover:bg-orange-500
-                           text-gray-900 font-semibold
-                           py-2 rounded-md
-                           shadow-sm transition">
-                                Sign in
-                            </button>
+                        <!-- Authentication Section -->
+                        <div class="relative px-6 py-6">
 
-                            <p class="text-xs text-gray-500 mt-2">
-                                New customer?
-                                <a href="#" class="text-blue-600 hover:underline">
-                                    Start here.
-                                </a>
+                            <!-- Login -->
+                            <a href="{{ route('login') }}"
+                                class="flex items-center gap-4
+                           w-full px-4 py-3
+                           rounded-lg
+                           hover:bg-gray-100
+                           transition">
+
+                                <div
+                                    class="w-10 h-10 flex items-center justify-center
+                               rounded-full bg-gray-900 text-white">
+
+                                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                                </div>
+
+                                <div>
+                                    <p class="text-sm font-semibold">
+                                        Login
+                                    </p>
+
+                                    <p class="text-xs text-gray-500">
+                                        Sign in to your account
+                                    </p>
+                                </div>
+
+                            </a>
+
+
+                            <!-- Sign Up -->
+                            <a href="{{ route('register') }}"
+                                class="flex items-center gap-4
+                           w-full px-4 py-3 mt-2
+                           rounded-lg
+                           hover:bg-gray-100
+                           transition">
+
+                                <div
+                                    class="w-10 h-10 flex items-center justify-center
+                               rounded-full bg-gray-100 text-gray-900">
+
+                                    <i class="fa-solid fa-user-plus"></i>
+
+                                </div>
+
+                                <div>
+                                    <p class="text-sm font-semibold">
+                                        Sign Up
+                                    </p>
+
+                                    <p class="text-xs text-gray-500">
+                                        Create a new customer account
+                                    </p>
+                                </div>
+
+                            </a>
+
+
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200 my-4"></div>
+
+
+                            <!-- Vendor Signup -->
+                            <a href="{{ route('vendor.register') }}"
+                                class="flex items-center gap-4
+                           w-full px-4 py-3
+                           rounded-lg
+                           bg-orange-50
+                           hover:bg-orange-100
+                           transition">
+
+                                <div
+                                    class="w-10 h-10 flex items-center justify-center
+                               rounded-full bg-orange-400 text-gray-900">
+
+                                    <i class="fa-solid fa-store"></i>
+
+                                </div>
+
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900">
+                                        Sign Up as Vendor
+                                    </p>
+
+                                    <p class="text-xs text-gray-600">
+                                        Start selling on OrviBazar
+                                    </p>
+                                </div>
+
+                            </a>
+
+                        </div>
+
+
+                        <!-- Bottom Information -->
+                        <div
+                            class="px-6 py-3
+                       bg-gray-50
+                       border-t border-gray-200
+                       rounded-b-md">
+
+                            <p class="text-xs text-center text-gray-500">
+                                Shop with us or start your own store.
                             </p>
-                        </div>
-
-                        <!-- Dropdown Content -->
-                        <div class="grid grid-cols-2 gap-6 p-6">
-
-                            <!-- Your Lists -->
-                            <div>
-                                <h3 class="text-sm font-bold mb-3">
-                                    Your Lists
-                                </h3>
-
-                                <ul class="space-y-2 text-sm text-gray-600">
-                                    <li>
-                                        <a href="#" class="hover:text-orange-500 hover:underline">
-                                            Create a List
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="#" class="hover:text-orange-500 hover:underline">
-                                            Your Wishlist
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="#" class="hover:text-orange-500 hover:underline">
-                                            Your Saved Items
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Your Account -->
-                            <div class="border-l border-gray-200 pl-6">
-                                <h3 class="text-sm font-bold mb-3">
-                                    Your Account
-                                </h3>
-
-                                <ul class="space-y-2 text-sm text-gray-600">
-                                    <li>
-                                        <a href="#" class="hover:text-orange-500 hover:underline">
-                                            Your Account
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="#" class="hover:text-orange-500 hover:underline">
-                                            Your Orders
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="#" class="hover:text-orange-500 hover:underline">
-                                            Your Addresses
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="#" class="hover:text-orange-500 hover:underline">
-                                            Payment Methods
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
 
                         </div>
+
                     </div>
 
                 </div>
+
             </div>
 
 
