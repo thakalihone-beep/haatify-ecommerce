@@ -20,7 +20,7 @@
 
 
     <!-- Today's Deals -->
-    <a href="#" class="flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
+    <a href="#" class="text-white hover:text-blue-500 flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         Today's Deals
 
@@ -28,7 +28,7 @@
 
 
     <!-- Best Sellers -->
-    <a href="#" class="flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
+    <a href="#" class="text-white hover:text-blue-500  flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         Best Sellers
 
@@ -36,7 +36,7 @@
 
 
     <!-- New Arrivals -->
-    <a href="#" class="flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
+    <a href="#" class="text-white hover:text-blue-500  flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         New Arrivals
 
@@ -45,7 +45,7 @@
 
     <!-- Today's Offers -->
     <a href="#"
-        class="hidden md:flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
+        class="text-white hover:text-blue-500 hidden md:flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         Today's Offers
 
@@ -54,7 +54,7 @@
 
     <!-- Customer Service -->
     <a href="#"
-        class="hidden lg:flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
+        class="text-white hover:text-blue-500 hidden lg:flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         Customer Service
 

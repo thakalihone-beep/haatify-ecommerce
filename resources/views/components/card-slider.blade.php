@@ -10,7 +10,7 @@
             Explore
         </p>
 
-        <h2 class="text-3xl sm:text-4xl font-black text-gray-900">
+        <h2 class="text-2xl sm:text-3xl font-black text-gray-900">
             Shop by Category
         </h2>
 
@@ -25,121 +25,148 @@
     <!-- SLIDER AREA -->
     <!-- ===================================================== -->
 
-    <div class="relative h-[430px] sm:h-[460px] flex items-center justify-center overflow-hidden"
-        style="perspective: 1600px;">
+    <div
+        id="categorySliderArea"
+        class="relative h-[430px] sm:h-[460px] flex items-center justify-center overflow-hidden"
+        style="perspective: 1600px;"
+    >
 
         @forelse ($categories ?? collect() as $category)
+
             <!-- ================================================= -->
-            <!-- CATEGORY CARD -->
+            <!-- CATEGORY CARD - JAVASCRIPT CONTROLS THIS -->
             <!-- ================================================= -->
 
             <div
                 class="category-card absolute
                        w-[230px] sm:w-[270px]
                        h-[330px] sm:h-[370px]
-                       rounded-3xl overflow-hidden
-                       bg-white
-                       shadow-[0_25px_70px_rgba(0,0,0,0.18)]
-                       border border-gray-200
+                       select-none
                        transition-all duration-700
-                       ease-[cubic-bezier(.22,.61,.36,1)]
-                       select-none">
+                       ease-[cubic-bezier(.22,.61,.36,1)]"
+            >
 
-                <!-- ============================================= -->
-                <!-- IMAGE -->
-                <!-- ============================================= -->
+                <!-- ================================================= -->
+                <!-- CARD INNER - HOVER CONTROLS THIS -->
+                <!-- ================================================= -->
 
-                <a href="{{ route('categories.show', $category->slug) }}" class="block relative h-full">
+                <div
+                    class="category-card-inner
+                           relative w-full h-full
+                           rounded-3xl overflow-hidden
+                           bg-white
+                           shadow-[0_25px_70px_rgba(0,0,0,0.18)]
+                           border border-gray-200
+                           transition-transform duration-300
+                           ease-out
+                           hover:scale-[1.03]"
+                >
 
-                    <img src="{{ $category->image ? asset('storage/' . ltrim($category->image, '/')) : asset('frontend/image/amazon1.jpg') }}"
-                        alt="{{ $category->name }}"
-                        class="category-image w-full h-full object-cover
-                               transition-transform duration-700">
+                    <!-- ============================================= -->
+                    <!-- CATEGORY LINK -->
+                    <!-- ============================================= -->
 
+                    <a
+                        href="{{ route('categories.show', $category->slug) }}"
+                        class="block relative w-full h-full"
+                    >
 
-                    <!-- ========================================= -->
-                    <!-- IMAGE GRADIENT -->
-                    <!-- ========================================= -->
+                        <!-- ========================================= -->
+                        <!-- IMAGE -->
+                        <!-- ========================================= -->
 
-                    <div
-                        class="absolute inset-0
-                               bg-gradient-to-t
-                               from-black/90
-                               via-black/20
-                               to-transparent">
-                    </div>
-
-
-                    <!-- ========================================= -->
-                    <!-- CATEGORY CONTENT -->
-                    <!-- ========================================= -->
-
-                    <div class="absolute bottom-0 left-0 right-0
-                               p-5 sm:p-6 text-white">
-
-                        <!-- Small Label -->
-
-                        <span
-                            class="inline-block mb-2
-                                   px-3 py-1
-                                   rounded-full
-                                   bg-white/20
-                                   backdrop-blur-md
-                                   border border-white/20
-                                   text-[11px]
-                                   uppercase
-                                   tracking-wider">
-                            Category
-                        </span>
+                        <img
+                            src="{{ $category->image
+                                ? asset('storage/' . ltrim($category->image, '/'))
+                                : asset('frontend/image/amazon1.jpg') }}"
+                            alt="{{ $category->name }}"
+                            class="category-image w-full h-full object-cover"
+                        >
 
 
-                        <!-- Category Name -->
+                        <!-- ========================================= -->
+                        <!-- IMAGE GRADIENT -->
+                        <!-- ========================================= -->
 
-                        <h3
-                            class="text-2xl sm:text-3xl
-                                   font-black
-                                   leading-tight
-                                   truncate">
-                            {{ $category->name }}
-                        </h3>
-
-
-                        <!-- Description -->
-
-                        <p
-                            class="mt-1
-                                   text-sm
-                                   text-gray-200">
-                            Explore {{ $category->name }}
-                        </p>
+                        <div
+                            class="absolute inset-0
+                                   bg-gradient-to-t
+                                   from-black/90
+                                   via-black/20
+                                   to-transparent
+                                   pointer-events-none"
+                        ></div>
 
 
-                        <!-- View Button -->
+                        <!-- ========================================= -->
+                        <!-- CATEGORY CONTENT -->
+                        <!-- ========================================= -->
 
-                        <div class="mt-4">
+                        <div
+                            class="absolute bottom-0 left-0 right-0
+                                   p-5 sm:p-6
+                                   text-white"
+                        >
 
-                            <span
-                                class="inline-flex items-center gap-2
-                                       text-sm font-semibold
-                                       group">
+                            <!-- ===================================== -->
+                            <!-- CATEGORY NAME -->
+                            <!-- ===================================== -->
 
-                                View Category
+                            <h3
+                                class="text-2xl sm:text-3xl
+                                       font-black
+                                       leading-tight
+                                       truncate"
+                            >
+                                {{ $category->name }}
+                            </h3>
+
+
+                            <!-- ===================================== -->
+                            <!-- DESCRIPTION -->
+                            <!-- ===================================== -->
+
+                            <p
+                                class="mt-1
+                                       text-sm
+                                       text-gray-200"
+                            >
+                                Explore {{ $category->name }}
+                            </p>
+
+
+                            <!-- ===================================== -->
+                            <!-- VIEW BUTTON -->
+                            <!-- ===================================== -->
+
+                            <div class="mt-4">
 
                                 <span
-                                    class="text-lg
-                                           transition-transform
-                                           duration-300
-                                           group-hover:translate-x-1">
-                                    →
+                                    class="inline-flex items-center gap-2
+                                           text-sm font-semibold
+                                           group"
+                                >
+
+                                    View Category
+
+                                    <span
+                                        class="text-lg
+                                               transition-transform
+                                               duration-300
+                                               group-hover:translate-x-1"
+                                    >
+                                        →
+                                    </span>
+
                                 </span>
 
-                            </span>
+                            </div>
 
                         </div>
 
-                    </div>
+                    </a>
 
-                </a>
+                </div>
 
             </div>
 
@@ -155,8 +182,11 @@
                     class="w-16 h-16 mx-auto mb-4
                            rounded-full
                            bg-gray-100
-                           flex items-center justify-center">
-                    <span class="text-2xl">📦</span>
+                           flex items-center justify-center"
+                >
+                    <span class="text-2xl">
+                        📦
+                    </span>
                 </div>
 
                 <p class="text-gray-500">
@@ -164,6 +194,7 @@
                 </p>
 
             </div>
+
         @endforelse
 
     </div>
@@ -173,7 +204,10 @@
     <!-- PREVIOUS BUTTON -->
     <!-- ===================================================== -->
 
-    <button id="categoryPrev" type="button" aria-label="Previous category"
+    <button
+        id="categoryPrev"
+        type="button"
+        aria-label="Previous category"
         class="absolute left-2 sm:left-6 top-[55%]
                -translate-y-1/2
                w-11 h-11 sm:w-14 sm:h-14
@@ -188,7 +222,8 @@
                hover:scale-110
                hover:bg-gray-900
                hover:text-white
-               z-30">
+               z-30"
+    >
         ←
     </button>
 
@@ -197,7 +232,10 @@
     <!-- NEXT BUTTON -->
     <!-- ===================================================== -->
 
-    <button id="categoryNext" type="button" aria-label="Next category"
+    <button
+        id="categoryNext"
+        type="button"
+        aria-label="Next category"
         class="absolute right-2 sm:right-6 top-[55%]
                -translate-y-1/2
                w-11 h-11 sm:w-14 sm:h-14
@@ -212,7 +250,8 @@
                hover:scale-110
                hover:bg-gray-900
                hover:text-white
-               z-30">
+               z-30"
+    >
         →
     </button>
 
@@ -221,7 +260,10 @@
     <!-- DOT INDICATORS -->
     <!-- ===================================================== -->
 
-    <div id="categoryDots" class="flex justify-center items-center gap-2 mt-6"></div>
+    <div
+        id="categoryDots"
+        class="flex justify-center items-center gap-2 mt-6"
+    ></div>
 
 </div>
 
@@ -232,452 +274,479 @@
 <!-- ========================================================= -->
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
 
-        const cards = document.querySelectorAll(".category-card");
+document.addEventListener("DOMContentLoaded", function () {
 
-        const prevButton = document.getElementById("categoryPrev");
+    /* =========================================================
+       ELEMENTS
+    ========================================================= */
 
-        const nextButton = document.getElementById("categoryNext");
+    const cards = document.querySelectorAll(".category-card");
 
-        const dotsContainer = document.getElementById("categoryDots");
+    const prevButton = document.getElementById("categoryPrev");
 
-        const totalCards = cards.length;
+    const nextButton = document.getElementById("categoryNext");
 
-        let current = 0;
+    const dotsContainer = document.getElementById("categoryDots");
+
+    const sliderArea = document.getElementById("categorySliderArea");
+
+    const totalCards = cards.length;
+
+    let current = 0;
 
 
-        // =========================================================
-        // STOP IF THERE ARE NO CARDS
-        // =========================================================
+    /* =========================================================
+       STOP IF THERE ARE NO CARDS
+    ========================================================= */
 
-        if (totalCards === 0) {
+    if (totalCards === 0) {
 
-            prevButton.style.display = "none";
-            nextButton.style.display = "none";
+        prevButton.style.display = "none";
+
+        nextButton.style.display = "none";
+
+        return;
+    }
+
+
+    /* =========================================================
+       CREATE DOTS
+    ========================================================= */
+
+    cards.forEach((card, index) => {
+
+        const dot = document.createElement("button");
+
+        dot.type = "button";
+
+        dot.className =
+            "category-dot w-2 h-2 rounded-full bg-gray-300 " +
+            "transition-all duration-300";
+
+        dot.setAttribute(
+            "aria-label",
+            "Go to category " + (index + 1)
+        );
+
+
+        dot.addEventListener("click", function () {
+
+            current = index;
+
+            updateSlider();
+
+        });
+
+
+        dotsContainer.appendChild(dot);
+
+    });
+
+
+    const dots = document.querySelectorAll(".category-dot");
+
+
+    /* =========================================================
+       CALCULATE CIRCULAR POSITION
+    ========================================================= */
+
+    function getPosition(index) {
+
+        let position = index - current;
+
+        const half = Math.floor(totalCards / 2);
+
+
+        if (position > half) {
+
+            position -= totalCards;
+
+        }
+
+
+        if (position < -half) {
+
+            position += totalCards;
+
+        }
+
+
+        return position;
+
+    }
+
+
+    /* =========================================================
+       UPDATE SLIDER
+    ========================================================= */
+
+    function updateSlider() {
+
+        cards.forEach((card, index) => {
+
+            const position = getPosition(index);
+
+
+            /* =================================================
+               CENTER
+            ================================================= */
+
+            if (position === 0) {
+
+                card.style.transform =
+                    "translateX(0px) " +
+                    "translateZ(180px) " +
+                    "rotateY(0deg) " +
+                    "scale(1)";
+
+                card.style.opacity = "1";
+
+                card.style.zIndex = "20";
+
+                card.style.filter = "brightness(1)";
+
+            }
+
+
+            /* =================================================
+               RIGHT
+            ================================================= */
+
+            else if (position === 1) {
+
+                card.style.transform =
+                    "translateX(245px) " +
+                    "translateZ(20px) " +
+                    "rotateY(-32deg) " +
+                    "scale(.84)";
+
+                card.style.opacity = ".85";
+
+                card.style.zIndex = "10";
+
+                card.style.filter = "brightness(.85)";
+
+            }
+
+
+            /* =================================================
+               LEFT
+            ================================================= */
+
+            else if (position === -1) {
+
+                card.style.transform =
+                    "translateX(-245px) " +
+                    "translateZ(20px) " +
+                    "rotateY(32deg) " +
+                    "scale(.84)";
+
+                card.style.opacity = ".85";
+
+                card.style.zIndex = "10";
+
+                card.style.filter = "brightness(.85)";
+
+            }
+
+
+            /* =================================================
+               FAR RIGHT
+            ================================================= */
+
+            else if (position === 2) {
+
+                card.style.transform =
+                    "translateX(430px) " +
+                    "translateZ(-180px) " +
+                    "rotateY(-55deg) " +
+                    "scale(.65)";
+
+                card.style.opacity = ".35";
+
+                card.style.zIndex = "5";
+
+                card.style.filter = "brightness(.65)";
+
+            }
+
+
+            /* =================================================
+               FAR LEFT
+            ================================================= */
+
+            else if (position === -2) {
+
+                card.style.transform =
+                    "translateX(-430px) " +
+                    "translateZ(-180px) " +
+                    "rotateY(55deg) " +
+                    "scale(.65)";
+
+                card.style.opacity = ".35";
+
+                card.style.zIndex = "5";
+
+                card.style.filter = "brightness(.65)";
+
+            }
+
+
+            /* =================================================
+               HIDE VERY FAR CARDS
+            ================================================= */
+
+            else {
+
+                card.style.transform =
+                    "translateX(0px) " +
+                    "translateZ(-500px) " +
+                    "scale(.4)";
+
+                card.style.opacity = "0";
+
+                card.style.zIndex = "0";
+
+            }
+
+        });
+
+
+        /* =====================================================
+           UPDATE DOTS
+        ===================================================== */
+
+        dots.forEach((dot, index) => {
+
+            if (index === current) {
+
+                dot.classList.remove(
+                    "w-2",
+                    "bg-gray-300"
+                );
+
+                dot.classList.add(
+                    "w-7",
+                    "bg-gray-900"
+                );
+
+            } else {
+
+                dot.classList.remove(
+                    "w-7",
+                    "bg-gray-900"
+                );
+
+                dot.classList.add(
+                    "w-2",
+                    "bg-gray-300"
+                );
+
+            }
+
+        });
+
+    }
+
+
+    /* =========================================================
+       NEXT
+    ========================================================= */
+
+    nextButton.addEventListener("click", function () {
+
+        current++;
+
+        if (current >= totalCards) {
+
+            current = 0;
+
+        }
+
+        updateSlider();
+
+    });
+
+
+    /* =========================================================
+       PREVIOUS
+    ========================================================= */
+
+    prevButton.addEventListener("click", function () {
+
+        current--;
+
+        if (current < 0) {
+
+            current = totalCards - 1;
+
+        }
+
+        updateSlider();
+
+    });
+
+
+    /* =========================================================
+       KEYBOARD CONTROL
+    ========================================================= */
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "ArrowRight") {
+
+            nextButton.click();
+
+        }
+
+
+        if (event.key === "ArrowLeft") {
+
+            prevButton.click();
+
+        }
+
+    });
+
+
+    /* =========================================================
+       TOUCH / SWIPE
+    ========================================================= */
+
+    let touchStartX = 0;
+
+    let touchEndX = 0;
+
+
+    sliderArea.addEventListener(
+        "touchstart",
+        function (event) {
+
+            touchStartX =
+                event.changedTouches[0].screenX;
+
+        },
+        { passive: true }
+    );
+
+
+    sliderArea.addEventListener(
+        "touchend",
+        function (event) {
+
+            touchEndX =
+                event.changedTouches[0].screenX;
+
+            handleSwipe();
+
+        },
+        { passive: true }
+    );
+
+
+    function handleSwipe() {
+
+        const distance =
+            touchEndX - touchStartX;
+
+
+        if (Math.abs(distance) < 50) {
 
             return;
 
         }
 
 
-        // =========================================================
-        // CREATE DOTS
-        // =========================================================
+        if (distance < 0) {
 
-        cards.forEach((card, index) => {
+            nextButton.click();
 
-            const dot = document.createElement("button");
+        } else {
 
-            dot.type = "button";
-
-            dot.className =
-                "category-dot w-2 h-2 rounded-full bg-gray-300 " +
-                "transition-all duration-300";
-
-            dot.setAttribute(
-                "aria-label",
-                "Go to category " + (index + 1)
-            );
-
-            dot.addEventListener("click", function() {
-
-                current = index;
-
-                updateSlider();
-
-            });
-
-            dotsContainer.appendChild(dot);
-
-        });
-
-
-        const dots = document.querySelectorAll(".category-dot");
-
-
-        // =========================================================
-        // CALCULATE CIRCULAR POSITION
-        // =========================================================
-
-        function getPosition(index) {
-
-            let position = index - current;
-
-            const half = Math.floor(totalCards / 2);
-
-            if (position > half) {
-
-                position -= totalCards;
-
-            }
-
-            if (position < -half) {
-
-                position += totalCards;
-
-            }
-
-            return position;
+            prevButton.click();
 
         }
 
-
-        // =========================================================
-        // UPDATE SLIDER
-        // =========================================================
-
-        function updateSlider() {
-
-            cards.forEach((card, index) => {
-
-                const position = getPosition(index);
+    }
 
 
-                // =================================================
-                // CENTER
-                // =================================================
+    /* =========================================================
+       AUTO PLAY
+    ========================================================= */
 
-                if (position === 0) {
+    let autoPlay = setInterval(function () {
 
-                    card.style.transform =
-                        "translateX(0px) " +
-                        "translateZ(180px) " +
-                        "rotateY(0deg) " +
-                        "scale(1)";
+        current++;
 
-                    card.style.opacity = "1";
+        if (current >= totalCards) {
 
-                    card.style.zIndex = "20";
-
-                    card.style.filter = "brightness(1)";
-
-                }
-
-
-                // =================================================
-                // RIGHT
-                // =================================================
-                else if (position === 1) {
-
-                    card.style.transform =
-                        "translateX(245px) " +
-                        "translateZ(20px) " +
-                        "rotateY(-32deg) " +
-                        "scale(.84)";
-
-                    card.style.opacity = ".85";
-
-                    card.style.zIndex = "10";
-
-                    card.style.filter = "brightness(.85)";
-
-                }
-
-
-                // =================================================
-                // LEFT
-                // =================================================
-                else if (position === -1) {
-
-                    card.style.transform =
-                        "translateX(-245px) " +
-                        "translateZ(20px) " +
-                        "rotateY(32deg) " +
-                        "scale(.84)";
-
-                    card.style.opacity = ".85";
-
-                    card.style.zIndex = "10";
-
-                    card.style.filter = "brightness(.85)";
-
-                }
-
-
-                // =================================================
-                // FAR RIGHT
-                // =================================================
-                else if (position === 2) {
-
-                    card.style.transform =
-                        "translateX(430px) " +
-                        "translateZ(-180px) " +
-                        "rotateY(-55deg) " +
-                        "scale(.65)";
-
-                    card.style.opacity = ".35";
-
-                    card.style.zIndex = "5";
-
-                    card.style.filter = "brightness(.65)";
-
-                }
-
-
-                // =================================================
-                // FAR LEFT
-                // =================================================
-                else if (position === -2) {
-
-                    card.style.transform =
-                        "translateX(-430px) " +
-                        "translateZ(-180px) " +
-                        "rotateY(55deg) " +
-                        "scale(.65)";
-
-                    card.style.opacity = ".35";
-
-                    card.style.zIndex = "5";
-
-                    card.style.filter = "brightness(.65)";
-
-                }
-
-
-                // =================================================
-                // HIDE VERY FAR CARDS
-                // =================================================
-                else {
-
-                    card.style.transform =
-                        "translateX(0px) " +
-                        "translateZ(-500px) " +
-                        "scale(.4)";
-
-                    card.style.opacity = "0";
-
-                    card.style.zIndex = "0";
-
-                }
-
-            });
-
-
-            // =====================================================
-            // UPDATE DOTS
-            // =====================================================
-
-            dots.forEach((dot, index) => {
-
-                if (index === current) {
-
-                    dot.classList.remove("w-2", "bg-gray-300");
-
-                    dot.classList.add(
-                        "w-7",
-                        "bg-gray-900"
-                    );
-
-                } else {
-
-                    dot.classList.remove(
-                        "w-7",
-                        "bg-gray-900"
-                    );
-
-                    dot.classList.add(
-                        "w-2",
-                        "bg-gray-300"
-                    );
-
-                }
-
-            });
+            current = 0;
 
         }
-
-
-        // =========================================================
-        // NEXT
-        // =========================================================
-
-        nextButton.addEventListener("click", function() {
-
-            current++;
-
-            if (current >= totalCards) {
-
-                current = 0;
-
-            }
-
-            updateSlider();
-
-        });
-
-
-        // =========================================================
-        // PREVIOUS
-        // =========================================================
-
-        prevButton.addEventListener("click", function() {
-
-            current--;
-
-            if (current < 0) {
-
-                current = totalCards - 1;
-
-            }
-
-            updateSlider();
-
-        });
-
-
-        // =========================================================
-        // KEYBOARD CONTROL
-        // =========================================================
-
-        document.addEventListener("keydown", function(event) {
-
-            if (event.key === "ArrowRight") {
-
-                nextButton.click();
-
-            }
-
-            if (event.key === "ArrowLeft") {
-
-                prevButton.click();
-
-            }
-
-        });
-
-
-        // =========================================================
-        // TOUCH / SWIPE
-        // =========================================================
-
-        let touchStartX = 0;
-
-        let touchEndX = 0;
-
-
-        const slider = document.getElementById("categoryNext")
-            .parentElement;
-
-
-        slider.addEventListener("touchstart", function(event) {
-
-            touchStartX = event.changedTouches[0].screenX;
-
-        });
-
-
-        slider.addEventListener("touchend", function(event) {
-
-            touchEndX = event.changedTouches[0].screenX;
-
-            handleSwipe();
-
-        });
-
-
-        function handleSwipe() {
-
-            const distance = touchEndX - touchStartX;
-
-
-            if (Math.abs(distance) < 50) {
-
-                return;
-
-            }
-
-
-            if (distance < 0) {
-
-                nextButton.click();
-
-            } else {
-
-                prevButton.click();
-
-            }
-
-        }
-
-
-        // =========================================================
-        // AUTO PLAY
-        // =========================================================
-
-        let autoPlay = setInterval(function() {
-
-            current++;
-
-            if (current >= totalCards) {
-
-                current = 0;
-
-            }
-
-            updateSlider();
-
-        }, 5000);
-
-
-        // =========================================================
-        // PAUSE WHEN MOUSE IS OVER SLIDER
-        // =========================================================
-
-        const sliderArea =
-            document.querySelector(".category-card")?.parentElement;
-
-
-        if (sliderArea) {
-
-            sliderArea.addEventListener("mouseenter", function() {
-
-                clearInterval(autoPlay);
-
-            });
-
-
-            sliderArea.addEventListener("mouseleave", function() {
-
-                autoPlay = setInterval(function() {
-
-                    current++;
-
-                    if (current >= totalCards) {
-
-                        current = 0;
-
-                    }
-
-                    updateSlider();
-
-                }, 5000);
-
-            });
-
-        }
-
-
-        // =========================================================
-        // INITIALIZE
-        // =========================================================
 
         updateSlider();
 
+    }, 5000);
 
-        // =========================================================
-        // DISABLE CONTROLS IF ONLY ONE CATEGORY
-        // =========================================================
 
-        if (totalCards <= 1) {
+    /* =========================================================
+       PAUSE WHEN MOUSE IS OVER SLIDER
+    ========================================================= */
 
-            prevButton.style.display = "none";
+    sliderArea.addEventListener(
+        "mouseenter",
+        function () {
 
-            nextButton.style.display = "none";
-
-            dotsContainer.style.display = "none";
+            clearInterval(autoPlay);
 
         }
+    );
 
-    });
+
+    sliderArea.addEventListener(
+        "mouseleave",
+        function () {
+
+            autoPlay = setInterval(function () {
+
+                current++;
+
+                if (current >= totalCards) {
+
+                    current = 0;
+
+                }
+
+                updateSlider();
+
+            }, 5000);
+
+        }
+    );
+
+
+    /* =========================================================
+       INITIALIZE
+    ========================================================= */
+
+    updateSlider();
+
+
+    /* =========================================================
+       DISABLE CONTROLS IF ONLY ONE CATEGORY
+    ========================================================= */
+
+    if (totalCards <= 1) {
+
+        prevButton.style.display = "none";
+
+        nextButton.style.display = "none";
+
+        dotsContainer.style.display = "none";
+
+    }
+
+});
+
 </script>

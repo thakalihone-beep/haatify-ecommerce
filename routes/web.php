@@ -20,3 +20,5 @@ Route::get('/register', [AuthController::class, 'showRegister'])
 
 Route::get('/vendor/register', [VendorController::class, 'showRegister'])
     ->name('vendor.register');
+Route::post('/vendor/register', [VendorController::class, 'store'])
+    ->name('vendor.register.submit');
