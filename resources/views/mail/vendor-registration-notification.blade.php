@@ -335,34 +335,7 @@
 
                             <tr>
 
-                                <!-- Application ID -->
-                                <td width="50%" style="
-                                    padding: 15px;
-                                    background-color: #f9fafb;
-                                    border-radius: 8px;
-                                ">
-
-                                    <p style="
-                                        margin: 0 0 5px;
-                                        font-size: 12px;
-                                        color: #6b7280;
-                                        text-transform: uppercase;
-                                    ">
-                                        Application ID
-                                    </p>
-
-                                    <p style="
-                                        margin: 0;
-                                        font-size: 16px;
-                                        font-weight: 700;
-                                        color: #111827;
-                                    ">
-                                        #{{ $vendor->id }}
-                                    </p>
-
-                                </td>
-
-
+                                
                                 <td width="10"></td>
 
 

@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\VendorRegistrationNotification;
+use App\Models\Admin;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+
+use Illuminate\Support\Facades\Log;
+
 
 class VendorController extends Controller
 {
@@ -61,11 +65,15 @@ class VendorController extends Controller
         ]);
 
 
-        // Send notification to admin
-        Mail::to('thakalihone@gmail.com')
-        //above $vendor is passed to the mail class constructor VendorRegistrationNotification
-            ->send(new VendorRegistrationNotification($vendor));
+        // Send notification to admin, but do not crash if no admin row exists yet.
+        $adminEmail = Admin::value('email') ?? config('mail.from.address');
 
+        if (! empty($adminEmail)) {
+            Mail::to($adminEmail)
+                ->send(new VendorRegistrationNotification($vendor));
+        } else {
+            Log::warning('No admin email is available for vendor registration notification.');
+        }
 
         // Return vendor to signup page
         return redirect()
