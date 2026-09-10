@@ -231,14 +231,23 @@
 
                     <button type="button" class="flex flex-col justify-center items-start h-full">
 
-                        <span class="text-xs text-gray-300 leading-none">
-                            Hello, sign in
-                        </span>
-
-                        <span class="flex items-center text-sm font-bold leading-tight mt-1">
-                            Account
-                            <i class="fa-solid fa-caret-down text-[11px] ml-1"></i>
-                        </span>
+                        @auth
+                            <span class="text-xs text-gray-300 leading-none">
+                                Hello, {{ Str::words(Auth::user()->name, 1, '') }}
+                            </span>
+                            <span class="flex items-center text-sm font-bold leading-tight mt-1">
+                                Account
+                                <i class="fa-solid fa-caret-down text-[11px] ml-1"></i>
+                            </span>
+                        @else
+                            <span class="text-xs text-gray-300 leading-none">
+                                Hello, sign in
+                            </span>
+                            <span class="flex items-center text-sm font-bold leading-tight mt-1">
+                                Account
+                                <i class="fa-solid fa-caret-down text-[11px] ml-1"></i>
+                            </span>
+                        @endauth
 
                     </button>
 
@@ -258,115 +267,160 @@
                         </div>
 
 
-                        <!-- Authentication Section -->
-                        <div class="relative px-6 py-6">
+                        @auth
+                            {{-- ===== LOGGED IN DROPDOWN ===== --}}
 
-                            <!-- Login -->
-                            <a href="{{ route('login') }}"
-                                class="flex items-center gap-4
-                           w-full px-4 py-3
-                           rounded-lg
-                           hover:bg-gray-100
-                           transition">
+                            <!-- User Info Header -->
+                            <div class="relative px-6 py-5 border-b border-gray-100 flex items-center gap-4">
 
-                                <div
-                                    class="w-10 h-10 flex items-center justify-center
-                               rounded-full bg-gray-900 text-white">
+                                {{-- Avatar --}}
+                                @if (Auth::user()->avatar)
+                                    <img src="{{ Auth::user()->avatar }}"
+                                         alt="{{ Auth::user()->name }}"
+                                         class="w-12 h-12 rounded-full object-cover border-2 border-orange-300">
+                                @else
+                                    <div class="w-12 h-12 rounded-full bg-orange-400 text-gray-900
+                                                flex items-center justify-center text-lg font-bold">
+                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                    </div>
+                                @endif
 
-                                    <i class="fa-solid fa-right-to-bracket"></i>
-
-                                </div>
-
-                                <div>
-                                    <p class="text-sm font-semibold">
-                                        Login
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-gray-900 truncate">
+                                        {{ Auth::user()->name }}
                                     </p>
-
-                                    <p class="text-xs text-gray-500">
-                                        Sign in to your account
+                                    <p class="text-xs text-gray-500 truncate">
+                                        {{ Auth::user()->email }}
                                     </p>
                                 </div>
 
-                            </a>
+                            </div>
+
+                            <!-- Menu Items -->
+                            <div class="px-4 py-3 space-y-1">
+
+                                <!-- My Orders -->
+                                <a href="#"
+                                    class="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg hover:bg-gray-100 transition">
+                                    <i class="fa-solid fa-box-open w-5 text-center text-gray-500"></i>
+                                    <span class="text-sm font-medium">My Orders</span>
+                                </a>
+
+                                <!-- Account Settings -->
+                                <a href="#"
+                                    class="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg hover:bg-gray-100 transition">
+                                    <i class="fa-solid fa-gear w-5 text-center text-gray-500"></i>
+                                    <span class="text-sm font-medium">Account Settings</span>
+                                </a>
+
+                                <!-- Wishlist -->
+                                <a href="#"
+                                    class="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg hover:bg-gray-100 transition">
+                                    <i class="fa-solid fa-heart w-5 text-center text-gray-500"></i>
+                                    <span class="text-sm font-medium">Wishlist</span>
+                                </a>
+
+                            </div>
+
+                            <!-- Logout -->
+                            <div class="px-4 pb-4 border-t border-gray-100 pt-3">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg
+                                               text-red-600 hover:bg-red-50 transition">
+                                        <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
+                                        <span class="text-sm font-medium">Sign Out</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                        @else
+                            {{-- ===== GUEST DROPDOWN ===== --}}
+
+                            <!-- Authentication Section -->
+                            <div class="relative px-6 py-6">
+
+                                <!-- Login -->
+                                <a href="{{ route('login') }}"
+                                    class="flex items-center gap-4
+                               w-full px-4 py-3
+                               rounded-lg
+                               hover:bg-gray-100
+                               transition">
+
+                                    <div
+                                        class="w-10 h-10 flex items-center justify-center
+                                   rounded-full bg-gray-900 text-white">
+                                        <i class="fa-solid fa-right-to-bracket"></i>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-sm font-semibold">Login</p>
+                                        <p class="text-xs text-gray-500">Sign in to your account</p>
+                                    </div>
+
+                                </a>
 
 
-                            <!-- Sign Up -->
-                            <a href="{{ route('register') }}"
-                                class="flex items-center gap-4
-                           w-full px-4 py-3 mt-2
-                           rounded-lg
-                           hover:bg-gray-100
-                           transition">
+                                <!-- Sign Up -->
+                                <a href="{{ route('register') }}"
+                                    class="flex items-center gap-4
+                               w-full px-4 py-3 mt-2
+                               rounded-lg
+                               hover:bg-gray-100
+                               transition">
 
-                                <div
-                                    class="w-10 h-10 flex items-center justify-center
-                               rounded-full bg-gray-100 text-gray-900">
+                                    <div
+                                        class="w-10 h-10 flex items-center justify-center
+                                   rounded-full bg-gray-100 text-gray-900">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                    </div>
 
-                                    <i class="fa-solid fa-user-plus"></i>
+                                    <div>
+                                        <p class="text-sm font-semibold">Sign Up</p>
+                                        <p class="text-xs text-gray-500">Create a new customer account</p>
+                                    </div>
 
-                                </div>
-
-                                <div>
-                                    <p class="text-sm font-semibold">
-                                        Sign Up
-                                    </p>
-
-                                    <p class="text-xs text-gray-500">
-                                        Create a new customer account
-                                    </p>
-                                </div>
-
-                            </a>
+                                </a>
 
 
-                            <!-- Divider -->
-                            <div class="border-t border-gray-200 my-4"></div>
+                                <!-- Divider -->
+                                <div class="border-t border-gray-200 my-4"></div>
 
 
-                            <!-- Vendor Signup -->
-                            <a href="{{ route('vendor.register') }}"
-                                class="flex items-center gap-4
-                           w-full px-4 py-3
-                           rounded-lg
-                           bg-orange-50
-                           hover:bg-orange-100
-                           transition">
+                                <!-- Vendor Signup -->
+                                <a href="{{ route('vendor.register') }}"
+                                    class="flex items-center gap-4
+                               w-full px-4 py-3
+                               rounded-lg
+                               bg-orange-50
+                               hover:bg-orange-100
+                               transition">
 
-                                <div
-                                    class="w-10 h-10 flex items-center justify-center
-                               rounded-full bg-orange-400 text-gray-900">
+                                    <div
+                                        class="w-10 h-10 flex items-center justify-center
+                                   rounded-full bg-orange-400 text-gray-900">
+                                        <i class="fa-solid fa-store"></i>
+                                    </div>
 
-                                    <i class="fa-solid fa-store"></i>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">Sign Up as Vendor</p>
+                                        <p class="text-xs text-gray-600">Start selling on Haatify</p>
+                                    </div>
 
-                                </div>
+                                </a>
 
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-900">
-                                        Sign Up as Vendor
-                                    </p>
+                            </div>
 
-                                    <p class="text-xs text-gray-600">
-                                        Start selling on OrviBazar
-                                    </p>
-                                </div>
+                            <!-- Bottom Info -->
+                            <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 rounded-b-md">
+                                <p class="text-xs text-center text-gray-500">
+                                    Shop with us or start your own store.
+                                </p>
+                            </div>
 
-                            </a>
-
-                        </div>
-
-
-                        <!-- Bottom Information -->
-                        <div
-                            class="px-6 py-3
-                       bg-gray-50
-                       border-t border-gray-200
-                       rounded-b-md">
-
-                            <p class="text-xs text-center text-gray-500">
-                                Shop with us or start your own store.
-                            </p>
-
-                        </div>
+                        @endauth
 
                     </div>
 
@@ -380,13 +434,8 @@
             <div
                 class="flex flex-col justify-center h-12 px-3 border border-transparent hover:border-white rounded-sm cursor-pointer whitespace-nowrap">
 
-                <span class="text-xs text-gray-200 leading-none">
-                    Returns
-                </span>
-
-                <span class="text-sm font-bold leading-tight mt-1">
-                    & Orders
-                </span>
+                <span class="text-xs text-gray-200 leading-none">Returns</span>
+                <span class="text-sm font-bold leading-tight mt-1">& Orders</span>
 
             </div>
 
@@ -396,10 +445,7 @@
                 class="flex items-center h-12 px-3 py-1 border border-transparent hover:border-white rounded-sm cursor-pointer whitespace-nowrap">
 
                 <i class="fa-solid fa-cart-shopping text-3xl mr-1"></i>
-
-                <span class="text-sm font-bold mb-1">
-                    Cart
-                </span>
+                <span class="text-sm font-bold mb-1">Cart</span>
 
             </div>
         </div>
