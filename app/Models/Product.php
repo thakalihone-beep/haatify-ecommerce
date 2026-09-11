@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\ProductVariation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-        protected $fillable = [
+    protected $fillable = [
         'vendor_id',
         'category_id',
         'name',

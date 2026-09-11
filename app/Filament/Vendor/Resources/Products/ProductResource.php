@@ -13,6 +13,9 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Override;
 
 class ProductResource extends Resource
 {
@@ -21,6 +24,12 @@ class ProductResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    #[Override]
+    public static function getEloquentQuery(): Builder
+    {
+        return Product::where('vendor_id', Auth::guard('vendor')->user()->id);
+    }
 
     public static function form(Schema $schema): Schema
     {

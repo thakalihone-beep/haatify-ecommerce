@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Models\Product;
 
 class PageController extends Controller
 {
@@ -12,5 +12,17 @@ class PageController extends Controller
         $categories = Category::all();
 
         return view('frontend.home', compact('categories'));
+    }
+
+    public function productCard()
+    {
+        $products = Product::with('category')
+            ->where('status', 'active')
+            ->latest()
+            ->get();
+
+        $categories = Category::latest()->get();
+
+        return view('frontend.home', compact('products', 'categories'));
     }
 }

@@ -24,9 +24,11 @@ class ProductsTable
                     ->searchable(),
                 TextColumn::make('price')
                     ->money()
+                    ->prefix('$')
                     ->sortable(),
                 TextColumn::make('discount_price')
                     ->money()
+                    ->suffix('%')
                     ->sortable(),
                 TextColumn::make('stock_qty')
                     ->numeric()
