@@ -46,8 +46,11 @@ class ProductForm
                     ])
                     ->columnSpanFull(),
                 FileUpload::make('images')
-                    ->default(null)
+                    ->image()
+                    ->disk('public')
+                    ->directory('products')
                     ->multiple()
+                    ->default(null)
                     ->columnSpanFull(),
                 TagsInput::make('tags')
                     ->default(null)

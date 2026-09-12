@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\ProductVariation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -36,6 +35,47 @@ class Product extends Model
         ];
     }
 
+    public function getFirstImageUrlAttribute(): ?string
+    {
+        $images = $this->images;
+
+        if (is_string($images)) {
+            $decoded = json_decode($images, true);
+            $images = is_array($decoded) ? $decoded : [$images];
+        }
+
+        if (! is_array($images) || empty($images[0])) {
+            return null;
+        }
+
+        $firstImage = (string) $images[0];
+
+        if ($firstImage === '') {
+            return null;
+        }
+
+        if (str_starts_with($firstImage, 'http://') || str_starts_with($firstImage, 'https://')) {
+            return $firstImage;
+        }
+
+        $path = ltrim($firstImage, '/');
+
+        if ($path === '') {
+            return null;
+        }
+
+        // The path may already include the "storage/" prefix depending on
+        // how it was stored, so normalise it before building the URL.
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, strlen('storage/'));
+        }
+
+        // Build a request-aware URL (respects the current host/port) instead
+        // of the APP_URL-bound Storage::url(), which breaks when the app is
+        // served on a different host/port than APP_URL.
+        return asset('storage/' . $path);
+    }
+
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
@@ -48,6 +88,6 @@ class Product extends Model
 
     public function variations(): HasMany
     {
-        return $this->hasMany(ProductVariation::class);
+        return $this->hasMany(ProductVaiation::class);
     }
 }

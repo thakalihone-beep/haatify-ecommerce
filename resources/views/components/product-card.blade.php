@@ -1,13 +1,7 @@
 @props(['product'])
 
 @php
-    $image = !empty($product->images)
-        ? (is_array($product->images) ? $product->images[0] : json_decode($product->images, true)[0] ?? null)
-        : null;
-
-    $imageUrl = $image
-        ? asset('storage/' . $image)
-        : asset('frontend/image/amazon1.jpg');
+    $imageUrl = $product->first_image_url ?? asset('frontend/image/amazon1.jpg');
 
     $hasDiscount = $product->discount_price &&
                    $product->discount_price < $product->price;
@@ -35,7 +29,7 @@
         type="button"
         class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-500 shadow-sm transition hover:bg-orange-500 hover:text-white dark:bg-gray-800/90"
         title="Add to wishlist"
-    >
+    >j
         <i class="fa-regular fa-heart"></i>
     </button>
 
