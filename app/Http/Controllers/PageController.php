@@ -25,4 +25,10 @@ class PageController extends Controller
 
         return view('frontend.home', compact('products', 'categories'));
     }
+    public function show(Product $product)
+    {
+        $product->load('category');
+
+        return view('frontend.product.show', compact('product'));
+    }
 }

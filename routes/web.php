@@ -39,3 +39,6 @@ Route::get('/google/redirect', [AuthController::class, 'redirect'])
 
 Route::get('/google/callback', [AuthController::class, 'callback'])
     ->name('google.callback');
+
+Route::get('/product/{product:slug}', [PageController::class, 'show'])
+    ->name('product.show');
