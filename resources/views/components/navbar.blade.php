@@ -275,11 +275,11 @@
 
                                 {{-- Avatar --}}
                                 @if (Auth::user()->avatar)
-                                    <img src="{{ Auth::user()->avatar }}"
-                                         alt="{{ Auth::user()->name }}"
-                                         class="w-12 h-12 rounded-full object-cover border-2 border-orange-300">
+                                    <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}"
+                                        class="w-12 h-12 rounded-full object-cover border-2 border-orange-300">
                                 @else
-                                    <div class="w-12 h-12 rounded-full bg-orange-400 text-gray-900
+                                    <div
+                                        class="w-12 h-12 rounded-full bg-orange-400 text-gray-900
                                                 flex items-center justify-center text-lg font-bold">
                                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                     </div>
@@ -334,7 +334,6 @@
                                     </button>
                                 </form>
                             </div>
-
                         @else
                             {{-- ===== GUEST DROPDOWN ===== --}}
 
@@ -444,8 +443,17 @@
             <div
                 class="flex items-center h-12 px-3 py-1 border border-transparent hover:border-white rounded-sm cursor-pointer whitespace-nowrap">
 
-                <i class="fa-solid fa-cart-shopping text-3xl mr-1"></i>
-                <span class="text-sm font-bold mb-1">Cart</span>
+                <a href="{{ route('cart.index') }}"
+                    class="flex items-center h-12 px-3 py-1 border border-transparent
+           rounded-sm cursor-pointer whitespace-nowrap">
+
+                    <i class="fa-solid fa-cart-shopping text-3xl mr-1"></i>
+
+                    <span class="text-sm font-bold mb-1">
+                        Cart
+                    </span>
+
+                </a>
 
             </div>
         </div>

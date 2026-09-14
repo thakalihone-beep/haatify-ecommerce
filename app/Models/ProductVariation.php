@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProductVaiation extends Model
+class ProductVariation extends Model
 {
+    protected $table = 'product_vaiations';
+
      protected $fillable = [
         'product_id',
         'sku',

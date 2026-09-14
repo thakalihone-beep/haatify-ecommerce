@@ -6,127 +6,147 @@
 
 @section('content')
 
+@php
+/*
+|--------------------------------------------------------------------------
+| Prepare product images
+|--------------------------------------------------------------------------
+*/
+
+
+$images = $product->images ?? [];
+
+if (is_string($images)) {
+    $decoded = json_decode($images, true);
+    $images = is_array($decoded) ? $decoded : [$images];
+}
+
+/*
+|--------------------------------------------------------------------------
+| Prepare variation attributes
+|
+| Example:
+| [
+|     "size" => ["S", "M", "L"],
+|     "color" => ["Black", "White"]
+| ]
+|--------------------------------------------------------------------------
+*/
+
+$variationAttributes = [];
+
+foreach ($product->variations as $variation) {
+    $attributes = $variation->attributes ?? [];
+
+    if (is_string($attributes)) {
+        $decoded = json_decode($attributes, true);
+        $attributes = is_array($decoded) ? $decoded : [];
+    }
+
+    foreach ($attributes as $attributeName => $attributeValue) {
+        if (!isset($variationAttributes[$attributeName])) {
+            $variationAttributes[$attributeName] = [];
+        }
+
+        if (!in_array($attributeValue, $variationAttributes[$attributeName])) {
+            $variationAttributes[$attributeName][] = $attributeValue;
+        }
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Product tags
+|--------------------------------------------------------------------------
+*/
+
+$tags = $product->tags ?? [];
+
+if (is_string($tags)) {
+    $decodedTags = json_decode($tags, true);
+    $tags = is_array($decodedTags) ? $decodedTags : [];
+}
+
+
+@endphp
+
 <div class="min-h-screen bg-gray-50 py-8">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {{-- Breadcrumb --}}
-        <div class="mb-6 text-sm text-gray-500">
-            <a href="{{route('home')}}" class="hover:text-orange-500">
-                Home
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {{-- =========================================================
+         BREADCRUMB
+    ========================================================== --}}
+
+    <div class="mb-6 text-sm text-gray-500">
+
+        <a href="{{ route('home') }}"
+           class="hover:text-orange-500">
+            Home
+        </a>
+
+        <span class="mx-2">/</span>
+
+        @if($product->category)
+
+            <a href="{{ route('categories.show', $product->category->slug) }}"
+               class="hover:text-orange-500">
+
+                {{ $product->category->name }}
+
             </a>
 
             <span class="mx-2">/</span>
 
-            @if($product->category)
-                <a href="{{ route('categories.show', $product->category->slug) }}"
-                   class="hover:text-orange-500">
-                    {{ $product->category->name }}
-                </a>
+        @endif
 
-                <span class="mx-2">/</span>
-            @endif
+        <span class="text-gray-700">
+            {{ $product->name }}
+        </span>
 
-            <span class="text-gray-700">
-                {{ $product->name }}
-            </span>
-        </div>
+    </div>
 
 
-        {{-- Product --}}
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    {{-- =========================================================
+         PRODUCT
+    ========================================================== --}}
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-10">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
 
-                {{-- =========================
-                     LEFT: PRODUCT IMAGES
-                ========================== --}}
-                <div>
-
-                    {{-- Main Image --}}
-                    <div class="border border-gray-200 rounded-xl overflow-hidden
-                                bg-white aspect-square flex items-center justify-center">
-
-                        @if($product->first_image_url)
-
-                            <img
-                                id="mainProductImage"
-                                src="{{ $product->first_image_url }}"
-                                alt="{{ $product->name }}"
-                                class="w-full h-full object-contain p-6"
-                            >
-
-                        @else
-
-                            <div class="flex flex-col items-center justify-center
-                                        text-gray-400">
-
-                                <i class="fa-solid fa-image text-6xl mb-3"></i>
-
-                                <span>
-                                    No image available
-                                </span>
-
-                            </div>
-
-                        @endif
-
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-10">
 
 
-                    {{-- Thumbnail Images --}}
-                    @php
-                        $images = $product->images ?? [];
+            {{-- =================================================
+                 LEFT: PRODUCT IMAGES
+            ================================================== --}}
 
-                        if (is_string($images)) {
-                            $decoded = json_decode($images, true);
-                            $images = is_array($decoded) ? $decoded : [$images];
-                        }
-                    @endphp
+            <div>
 
-                    @if(is_array($images) && count($images) > 0)
+                {{-- Main Image --}}
 
-                        <div class="flex gap-3 mt-4 overflow-x-auto pb-2">
+                <div class="border border-gray-200 rounded-xl overflow-hidden
+                            bg-white aspect-square flex items-center justify-center">
 
-                            @foreach($images as $image)
+                    @if($product->first_image_url)
 
-                                @php
-                                    $imagePath = (string) $image;
+                        <img
+                            id="mainProductImage"
+                            src="{{ $product->first_image_url }}"
+                            alt="{{ $product->name }}"
+                            class="w-full h-full object-contain p-6"
+                        >
 
-                                    if (
-                                        !str_starts_with($imagePath, 'http://') &&
-                                        !str_starts_with($imagePath, 'https://')
-                                    ) {
-                                        $imagePath = ltrim($imagePath, '/');
+                    @else
 
-                                        if (str_starts_with($imagePath, 'storage/')) {
-                                            $imagePath = substr(
-                                                $imagePath,
-                                                strlen('storage/')
-                                            );
-                                        }
+                        <div class="flex flex-col items-center justify-center
+                                    text-gray-400">
 
-                                        $imagePath = asset('storage/' . $imagePath);
-                                    }
-                                @endphp
+                            <i class="fa-solid fa-image text-6xl mb-3"></i>
 
-                                <button
-                                    type="button"
-                                    onclick="changeMainImage('{{ $imagePath }}')"
-                                    class="flex-shrink-0 w-20 h-20 border-2
-                                           border-gray-200 rounded-lg overflow-hidden
-                                           hover:border-orange-500
-                                           focus:border-orange-500">
-
-                                    <img
-                                        src="{{ $imagePath }}"
-                                        alt="{{ $product->name }}"
-                                        class="w-full h-full object-contain p-1"
-                                    >
-
-                                </button>
-
-                            @endforeach
+                            <span>
+                                No image available
+                            </span>
 
                         </div>
 
@@ -135,125 +155,272 @@
                 </div>
 
 
-                {{-- =========================
-                     RIGHT: PRODUCT INFORMATION
-                ========================== --}}
-                <div>
+                {{-- Thumbnail Images --}}
 
-                    {{-- Category --}}
-                    @if($product->category)
+                @if(is_array($images) && count($images) > 0)
 
-                        <a
-                            href="{{ route('categories.show', $product->category->slug) }}"
-                            class="text-sm text-orange-600 font-medium hover:underline"
-                        >
-                            {{ $product->category->name }}
-                        </a>
+                    <div class="flex gap-3 mt-4 overflow-x-auto pb-2">
 
-                    @endif
-
-
-                    {{-- Product Name --}}
-                    <h1 class="text-2xl md:text-3xl font-semibold
-                               text-gray-900 mt-2 leading-tight">
-
-                        {{ $product->name }}
-
-                    </h1>
-
-
-                    {{-- Rating --}}
-                    <div class="flex items-center gap-3 mt-4">
-
-                        <div class="flex items-center">
+                        @foreach($images as $image)
 
                             @php
-                                $rating = (float) $product->avg_rating;
-                                $fullStars = floor($rating);
-                                $hasHalfStar = ($rating - $fullStars) >= 0.5;
+                                $imagePath = (string) $image;
+
+                                if (
+                                    !str_starts_with($imagePath, 'http://') &&
+                                    !str_starts_with($imagePath, 'https://')
+                                ) {
+                                    $imagePath = ltrim($imagePath, '/');
+
+                                    if (str_starts_with($imagePath, 'storage/')) {
+                                        $imagePath = substr(
+                                            $imagePath,
+                                            strlen('storage/')
+                                        );
+                                    }
+
+                                    $imagePath = asset('storage/' . $imagePath);
+                                }
                             @endphp
 
-                            @for($i = 1; $i <= 5; $i++)
+                            <button
+                                type="button"
+                                onclick="changeMainImage(@js($imagePath))"
+                                class="flex-shrink-0 w-20 h-20 border-2
+                                       border-gray-200 rounded-lg overflow-hidden
+                                       hover:border-orange-500
+                                       focus:border-orange-500"
+                            >
 
-                                @if($i <= $fullStars)
+                                <img
+                                    src="{{ $imagePath }}"
+                                    alt="{{ $product->name }}"
+                                    class="w-full h-full object-contain p-1"
+                                >
 
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
+                            </button>
 
-                                @elseif($hasHalfStar && $i == $fullStars + 1)
+                        @endforeach
 
-                                    <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
+                    </div>
 
-                                @else
+                @endif
 
-                                    <i class="fa-regular fa-star text-gray-300"></i>
+            </div>
 
-                                @endif
 
-                            @endfor
+            {{-- =================================================
+                 RIGHT: PRODUCT INFORMATION
+            ================================================== --}}
 
-                        </div>
+            <div>
 
-                        <span class="text-sm text-gray-600">
-                            {{ number_format($rating, 1) }}
-                        </span>
+                {{-- Category --}}
+
+                @if($product->category)
+
+                    <a
+                        href="{{ route('categories.show', $product->category->slug) }}"
+                        class="text-sm text-orange-600 font-medium hover:underline"
+                    >
+                        {{ $product->category->name }}
+                    </a>
+
+                @endif
+
+
+                {{-- Product Name --}}
+
+                <h1 class="text-2xl md:text-3xl font-semibold
+                           text-gray-900 mt-2 leading-tight">
+
+                    {{ $product->name }}
+
+                </h1>
+
+
+                {{-- Rating --}}
+
+                <div class="flex items-center gap-3 mt-4">
+
+                    <div class="flex items-center">
+
+                        @php
+                            $rating = (float) $product->avg_rating;
+                            $fullStars = floor($rating);
+                            $hasHalfStar = ($rating - $fullStars) >= 0.5;
+                        @endphp
+
+                        @for($i = 1; $i <= 5; $i++)
+
+                            @if($i <= $fullStars)
+
+                                <i class="fa-solid fa-star text-yellow-400"></i>
+
+                            @elseif($hasHalfStar && $i == $fullStars + 1)
+
+                                <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
+
+                            @else
+
+                                <i class="fa-regular fa-star text-gray-300"></i>
+
+                            @endif
+
+                        @endfor
+
+                    </div>
+
+                    <span class="text-sm text-gray-600">
+                        {{ number_format($rating, 1) }}
+                    </span>
+
+                </div>
+
+
+                <div class="border-t border-gray-200 my-6"></div>
+
+
+                {{-- =================================================
+                     VARIATIONS
+                ================================================== --}}
+
+                @if($product->variations->count() > 0)
+
+                    <div class="space-y-5 mb-6">
+
+                        @foreach($variationAttributes as $attributeName => $attributeValues)
+
+                            <div>
+
+                                <div class="flex items-center justify-between mb-2">
+
+                                    <label class="font-semibold text-gray-800 capitalize">
+
+                                        {{ str_replace('_', ' ', $attributeName) }}:
+
+                                        <span
+                                            id="selected-{{ $attributeName }}"
+                                            class="font-normal text-gray-500"
+                                        >
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+
+                                <div class="flex flex-wrap gap-2">
+
+                                    @foreach($attributeValues as $attributeValue)
+
+                                        <button
+                                            type="button"
+                                            class="variation-option border border-gray-300
+                                                   rounded-lg px-4 py-2 text-sm
+                                                   hover:border-orange-500
+                                                   hover:text-orange-500
+                                                   transition"
+                                            data-attribute="{{ $attributeName }}"
+                                            data-value="{{ $attributeValue }}"
+                                            onclick="selectVariationOption(
+                                                '{{ $attributeName }}',
+                                                @js($attributeValue),
+                                                this
+                                            )"
+                                        >
+                                            {{ $attributeValue }}
+                                        </button>
+
+                                    @endforeach
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
 
                     </div>
 
 
-                    {{-- Divider --}}
-                    <div class="border-t border-gray-200 my-6"></div>
+                    {{-- Selected Variation ID --}}
+
+                    <input
+                        type="hidden"
+                        id="selectedVariationId"
+                        value=""
+                    >
+
+                @endif
 
 
-                    {{-- Price --}}
-                    <div>
+                {{-- =================================================
+                     PRICE
+                ================================================== --}}
 
+                <div>
+
+                    <span
+                        id="productPrice"
+                        class="text-3xl font-bold text-gray-900"
+                    >
                         @if($product->discount_price)
-
-                            <div class="flex items-center gap-3">
-
-                                <span class="text-3xl font-bold text-gray-900">
-                                    Rs. {{ number_format($product->discount_price, 2) }}
-                                </span>
-
-                                <span class="text-lg text-gray-400 line-through">
-                                    Rs. {{ number_format($product->price, 2) }}
-                                </span>
-
-                            </div>
-
-                            @if($product->price > 0)
-
-                                @php
-                                    $discount = (
-                                        ($product->price - $product->discount_price)
-                                        / $product->price
-                                    ) * 100;
-                                @endphp
-
-                                <span class="inline-block mt-2 px-2 py-1
-                                             text-sm font-semibold
-                                             text-green-700 bg-green-100
-                                             rounded">
-
-                                    {{ round($discount) }}% off
-
-                                </span>
-
-                            @endif
-
+                            $. {{ number_format($product->discount_price, 2) }}
                         @else
+                            $. {{ number_format($product->price, 2) }}
+                        @endif
+                    </span>
 
-                            <span class="text-3xl font-bold text-gray-900">
-                                Rs. {{ number_format($product->price, 2) }}
+
+                    <span
+                        id="originalProductPrice"
+                        class="text-lg text-gray-400 line-through ml-3
+                        {{ $product->discount_price ? '' : 'hidden' }}"
+                    >
+                        @if($product->discount_price)
+                            $. {{ number_format($product->price, 2) }}
+                        @endif
+                    </span>
+
+
+                    <div id="discountBadge">
+
+                        @if(
+                            $product->discount_price &&
+                            $product->price > 0 &&
+                            $product->discount_price < $product->price
+                        )
+
+                            @php
+                                $discount = (
+                                    ($product->price - $product->discount_price)
+                                    / $product->price
+                                ) * 100;
+                            @endphp
+
+                            <span class="inline-block mt-2 px-2 py-1
+                                         text-sm font-semibold
+                                         text-green-700 bg-green-100
+                                         rounded">
+
+                                {{ round($discount) }}% off
+
                             </span>
 
                         @endif
 
                     </div>
 
+                </div>
 
-                    {{-- Stock --}}
-                    <div class="mt-5">
+
+                {{-- =================================================
+                     STOCK
+                ================================================== --}}
+
+                <div class="mt-5">
+
+                    <div id="stockInformation">
 
                         @if($product->stock_qty > 0)
 
@@ -287,212 +454,206 @@
 
                     </div>
 
-
-                    {{-- Description --}}
-                    @if($product->description)
-
-                        <div class="mt-6">
-
-                            <h2 class="text-lg font-semibold text-gray-900 mb-2">
-                                About this product
-                            </h2>
-
-                            <div class="text-gray-600 leading-relaxed">
-                                {!! nl2br(e($product->description)) !!}
-                            </div>
-
-                        </div>
-
-                    @endif
+                </div>
 
 
-                    {{-- Tags --}}
-                    @php
-                        $tags = $product->tags ?? [];
+                {{-- =================================================
+                     DESCRIPTION
+                ================================================== --}}
 
-                        if (is_string($tags)) {
-                            $decodedTags = json_decode($tags, true);
-                            $tags = is_array($decodedTags) ? $decodedTags : [];
-                        }
-                    @endphp
+                @if($product->description)
 
-                    @if(is_array($tags) && count($tags) > 0)
+                    <div class="mt-6">
 
-                        <div class="mt-5">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                            About this product
+                        </h2>
 
-                            <div class="flex flex-wrap gap-2">
+                        <div class="text-gray-600 leading-relaxed">
 
-                                @foreach($tags as $tag)
-
-                                    <span class="px-3 py-1 bg-gray-100
-                                                 text-gray-600 text-sm
-                                                 rounded-full">
-
-                                        #{{ $tag }}
-
-                                    </span>
-
-                                @endforeach
-
-                            </div>
+                            {!! nl2br(e($product->description)) !!}
 
                         </div>
 
-                    @endif
+                    </div>
+
+                @endif
 
 
-                    {{-- Divider --}}
-                    <div class="border-t border-gray-200 my-6"></div>
+                {{-- =================================================
+                     TAGS
+                ================================================== --}}
 
+                @if(is_array($tags) && count($tags) > 0)
 
-                    {{-- Quantity --}}
-                    @if($product->stock_qty > 0)
+                    <div class="mt-5">
 
-                        <div class="flex items-center gap-4 mb-5">
+                        <div class="flex flex-wrap gap-2">
 
-                            <span class="font-medium text-gray-800">
-                                Quantity:
-                            </span>
+                            @foreach($tags as $tag)
 
-                            <div class="flex items-center border border-gray-300
-                                        rounded-lg overflow-hidden">
+                                <span class="px-3 py-1 bg-gray-100
+                                             text-gray-600 text-sm
+                                             rounded-full">
 
-                                <button
-                                    type="button"
-                                    onclick="decreaseQuantity()"
-                                    class="w-10 h-10 hover:bg-gray-100"
-                                >
-                                    −
-                                </button>
+                                    #{{ $tag }}
 
-                                <input
-                                    id="quantity"
-                                    type="number"
-                                    value="1"
-                                    min="1"
-                                    max="{{ $product->stock_qty }}"
-                                    class="w-14 h-10 text-center border-x
-                                           border-gray-300 focus:outline-none"
-                                >
+                                </span>
 
-                                <button
-                                    type="button"
-                                    onclick="increaseQuantity()"
-                                    class="w-10 h-10 hover:bg-gray-100"
-                                >
-                                    +
-                                </button>
-
-                            </div>
+                            @endforeach
 
                         </div>
 
+                    </div>
 
-                        {{-- Buttons --}}
-                        <div class="flex flex-col sm:flex-row gap-3">
+                @endif
+
+
+                <div class="border-t border-gray-200 my-6"></div>
+
+
+                {{-- =================================================
+                     QUANTITY
+                ================================================== --}}
+
+                <div id="purchaseSection">
+
+                    <div class="flex items-center gap-4 mb-5">
+
+                        <span class="font-medium text-gray-800">
+                            Quantity:
+                        </span>
+
+                        <div class="flex items-center border border-gray-300
+                                    rounded-lg overflow-hidden">
 
                             <button
                                 type="button"
-                                class="flex-1 bg-yellow-400
-                                       hover:bg-yellow-500
-                                       text-gray-900 font-semibold
-                                       py-3 px-6 rounded-lg
-                                       transition"
+                                onclick="decreaseQuantity()"
+                                class="w-10 h-10 hover:bg-gray-100"
                             >
-
-                                <i class="fa-solid fa-cart-plus mr-2"></i>
-
-                                Add to Cart
-
+                                −
                             </button>
 
+                            <input
+                                id="quantity"
+                                type="number"
+                                value="1"
+                                min="1"
+                                max="{{ $product->stock_qty }}"
+                                class="w-14 h-10 text-center border-x
+                                       border-gray-300 focus:outline-none"
+                            >
 
                             <button
                                 type="button"
-                                class="flex-1 bg-orange-500
-                                       hover:bg-orange-600
-                                       text-white font-semibold
-                                       py-3 px-6 rounded-lg
-                                       transition"
+                                onclick="increaseQuantity()"
+                                class="w-10 h-10 hover:bg-gray-100"
                             >
-
-                                Buy Now
-
+                                +
                             </button>
 
                         </div>
 
+                    </div>
 
-                        {{-- Wishlist --}}
+
+                    {{-- Buttons --}}
+
+                    <div class="flex flex-col sm:flex-row gap-3">
+
                         <button
+                            id="addToCartButton"
                             type="button"
-                            class="w-full mt-3 border border-gray-300
-                                   hover:border-red-400
-                                   hover:text-red-500
-                                   text-gray-700 font-medium
-                                   py-3 rounded-lg transition"
+                            class="flex-1 bg-yellow-400
+                                   hover:bg-yellow-500
+                                   text-gray-900 font-semibold
+                                   py-3 px-6 rounded-lg
+                                   transition"
                         >
 
-                            <i class="fa-regular fa-heart mr-2"></i>
+                            <i class="fa-solid fa-cart-plus mr-2"></i>
 
-                            Add to Wishlist
+                            Add to Cart
 
                         </button>
 
-                    @else
 
                         <button
+                            id="buyNowButton"
                             type="button"
-                            disabled
-                            class="w-full bg-gray-300 text-gray-500
-                                   font-semibold py-3 rounded-lg
-                                   cursor-not-allowed"
+                            class="flex-1 bg-orange-500
+                                   hover:bg-orange-600
+                                   text-white font-semibold
+                                   py-3 px-6 rounded-lg
+                                   transition"
                         >
 
-                            Out of Stock
+                            Buy Now
 
                         </button>
 
-                    @endif
+                    </div>
 
 
-                    {{-- Delivery Information --}}
-                    <div class="mt-6 bg-gray-50 rounded-lg p-4">
+                    {{-- Wishlist --}}
 
-                        <div class="flex items-start gap-3 mb-4">
+                    <button
+                        type="button"
+                        class="w-full mt-3 border border-gray-300
+                               hover:border-red-400
+                               hover:text-red-500
+                               text-gray-700 font-medium
+                               py-3 rounded-lg transition"
+                    >
 
-                            <i class="fa-solid fa-truck text-orange-500 mt-1"></i>
+                        <i class="fa-regular fa-heart mr-2"></i>
 
-                            <div>
+                        Add to Wishlist
 
-                                <p class="font-medium text-gray-800">
-                                    Delivery
-                                </p>
+                    </button>
 
-                                <p class="text-sm text-gray-500">
-                                    Delivery available across Nepal
-                                </p>
+                </div>
 
-                            </div>
+
+                {{-- =================================================
+                     DELIVERY INFORMATION
+                ================================================== --}}
+
+                <div class="mt-6 bg-gray-50 rounded-lg p-4">
+
+                    <div class="flex items-start gap-3 mb-4">
+
+                        <i class="fa-solid fa-truck text-orange-500 mt-1"></i>
+
+                        <div>
+
+                            <p class="font-medium text-gray-800">
+                                Delivery
+                            </p>
+
+                            <p class="text-sm text-gray-500">
+                                Delivery available across Nepal
+                            </p>
 
                         </div>
 
+                    </div>
 
-                        <div class="flex items-start gap-3">
 
-                            <i class="fa-solid fa-shield-halved text-green-600 mt-1"></i>
+                    <div class="flex items-start gap-3">
 
-                            <div>
+                        <i class="fa-solid fa-shield-halved text-green-600 mt-1"></i>
 
-                                <p class="font-medium text-gray-800">
-                                    Secure Shopping
-                                </p>
+                        <div>
 
-                                <p class="text-sm text-gray-500">
-                                    Safe and secure checkout
-                                </p>
+                            <p class="font-medium text-gray-800">
+                                Secure Shopping
+                            </p>
 
-                            </div>
+                            <p class="text-sm text-gray-500">
+                                Safe and secure checkout
+                            </p>
 
                         </div>
 
@@ -504,79 +665,84 @@
 
         </div>
 
+    </div>
 
-        {{-- =========================
-             PRODUCT DETAILS
-        ========================== --}}
-        <div class="bg-white rounded-xl shadow-sm mt-8 p-6 lg:p-10">
 
-            <h2 class="text-2xl font-semibold text-gray-900 mb-6">
-                Product Details
-            </h2>
+    {{-- =========================================================
+         PRODUCT DETAILS
+    ========================================================== --}}
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+    <div class="bg-white rounded-xl shadow-sm mt-8 p-6 lg:p-10">
+
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">
+            Product Details
+        </h2>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+
+            <div class="flex justify-between border-b py-3">
+
+                <span class="text-gray-500">
+                    Product
+                </span>
+
+                <span class="font-medium text-gray-800">
+                    {{ $product->name }}
+                </span>
+
+            </div>
+
+
+            @if($product->category)
 
                 <div class="flex justify-between border-b py-3">
 
                     <span class="text-gray-500">
-                        Product
+                        Category
                     </span>
 
                     <span class="font-medium text-gray-800">
-                        {{ $product->name }}
+                        {{ $product->category->name }}
                     </span>
 
                 </div>
 
-
-                @if($product->category)
-
-                    <div class="flex justify-between border-b py-3">
-
-                        <span class="text-gray-500">
-                            Category
-                        </span>
-
-                        <span class="font-medium text-gray-800">
-                            {{ $product->category->name }}
-                        </span>
-
-                    </div>
-
-                @endif
+            @endif
 
 
-                <div class="flex justify-between border-b py-3">
+            <div class="flex justify-between border-b py-3">
 
-                    <span class="text-gray-500">
-                        Availability
-                    </span>
+                <span class="text-gray-500">
+                    Availability
+                </span>
 
-                    <span class="font-medium
-                        {{ $product->stock_qty > 0
-                            ? 'text-green-600'
-                            : 'text-red-600' }}">
+                <span
+                    id="detailAvailability"
+                    class="font-medium
+                    {{ $product->stock_qty > 0
+                        ? 'text-green-600'
+                        : 'text-red-600' }}"
+                >
 
-                        {{ $product->stock_qty > 0
-                            ? 'In Stock'
-                            : 'Out of Stock' }}
+                    {{ $product->stock_qty > 0
+                        ? 'In Stock'
+                        : 'Out of Stock' }}
 
-                    </span>
+                </span>
 
-                </div>
+            </div>
 
 
-                <div class="flex justify-between border-b py-3">
+            <div class="flex justify-between border-b py-3">
 
-                    <span class="text-gray-500">
-                        Rating
-                    </span>
+                <span class="text-gray-500">
+                    Rating
+                </span>
 
-                    <span class="font-medium text-gray-800">
-                        {{ number_format((float) $product->avg_rating, 1) }} / 5
-                    </span>
-
-                </div>
+                <span class="font-medium text-gray-800">
+                    {{ number_format((float) $product->avg_rating, 1) }} / 5
+                </span>
 
             </div>
 
@@ -587,53 +753,288 @@
 </div>
 
 
-{{-- =========================
-     JAVASCRIPT
-========================== --}}
+</div>
+
+{{-- =========================================================
+VARIATION DATA FOR JAVASCRIPT
+========================================================= --}}
+
 <script>
+    const productVariations = @json($product->variations);
 
-    function changeMainImage(imageUrl) {
+    let selectedAttributes = {};
 
+    function changeMainImage(imageUrl)
+    {
         const mainImage = document.getElementById('mainProductImage');
 
-        if (mainImage) {
+        if (mainImage && imageUrl) {
             mainImage.src = imageUrl;
         }
-
     }
 
+    function selectVariationOption(attributeName, attributeValue, button)
+    {
+        selectedAttributes[attributeName] = attributeValue;
 
-    function increaseQuantity() {
+        document
+            .querySelectorAll(
+                `.variation-option[data-attribute="${attributeName}"]`
+            )
+            .forEach(option => {
 
-        const quantity = document.getElementById('quantity');
+                option.classList.remove(
+                    'border-orange-500',
+                    'bg-orange-50',
+                    'text-orange-600'
+                );
 
-        if (!quantity) return;
+                option.classList.add('border-gray-300');
+            });
 
-        const max = parseInt(quantity.max);
-        const current = parseInt(quantity.value);
+        button.classList.remove('border-gray-300');
+
+        button.classList.add(
+            'border-orange-500',
+            'bg-orange-50',
+            'text-orange-600'
+        );
+
+        const selectedText = document.getElementById(
+            `selected-${attributeName}`
+        );
+
+        if (selectedText) {
+            selectedText.textContent = attributeValue;
+        }
+
+        findMatchingVariation();
+    }
+
+    function findMatchingVariation()
+    {
+        const variation = productVariations.find(variation => {
+
+            if (!variation.is_active) {
+                return false;
+            }
+
+            let attributes = variation.attributes;
+
+            if (typeof attributes === 'string') {
+                try {
+                    attributes = JSON.parse(attributes);
+                } catch (error) {
+                    attributes = {};
+                }
+            }
+
+            return Object.entries(selectedAttributes).every(
+                ([attributeName, attributeValue]) => {
+                    return attributes[attributeName] == attributeValue;
+                }
+            );
+        });
+
+        if (!variation) {
+            return;
+        }
+
+        document.getElementById('selectedVariationId').value =
+            variation.id;
+
+        updatePrice(variation);
+
+        updateStock(variation);
+
+        if (variation.image) {
+
+            let imageUrl = variation.image;
+
+            if (
+                !imageUrl.startsWith('http://') &&
+                !imageUrl.startsWith('https://')
+            ) {
+
+                imageUrl = imageUrl.replace(/^\/+/, '');
+
+                if (imageUrl.startsWith('storage/')) {
+                    imageUrl = imageUrl.substring(8);
+                }
+
+                imageUrl = "{{ asset('storage') }}/" + imageUrl;
+            }
+
+            changeMainImage(imageUrl);
+        }
+    }
+
+    function updatePrice(variation)
+    {
+        const priceElement =
+            document.getElementById('productPrice');
+
+        const originalPriceElement =
+            document.getElementById('originalProductPrice');
+
+        const discountBadge =
+            document.getElementById('discountBadge');
+
+        const hasDiscount =
+            variation.discount_price !== null &&
+            Number(variation.discount_price) < Number(variation.price);
+
+        const finalPrice =
+            hasDiscount
+                ? variation.discount_price
+                : variation.price;
+
+        priceElement.textContent =
+            '$. ' + Number(finalPrice).toFixed(2);
+
+        if (hasDiscount) {
+
+            originalPriceElement.textContent =
+                '$. ' + Number(variation.price).toFixed(2);
+
+            originalPriceElement.classList.remove('hidden');
+
+            const discount =
+                (
+                    (Number(variation.price) -
+                    Number(variation.discount_price))
+                    / Number(variation.price)
+                ) * 100;
+
+            discountBadge.innerHTML = `
+                <span class="inline-block mt-2 px-2 py-1
+                             text-sm font-semibold
+                             text-green-700 bg-green-100
+                             rounded">
+                    ${Math.round(discount)}% off
+                </span>
+            `;
+
+        } else {
+
+            originalPriceElement.classList.add('hidden');
+
+            discountBadge.innerHTML = '';
+        }
+    }
+
+    function updateStock(variation)
+    {
+        const stockInformation =
+            document.getElementById('stockInformation');
+
+        const quantity =
+            document.getElementById('quantity');
+
+        const purchaseSection =
+            document.getElementById('purchaseSection');
+
+        const detailAvailability =
+            document.getElementById('detailAvailability');
+
+        if (variation.stock_qty > 0) {
+
+            stockInformation.innerHTML = `
+
+                <div class="flex items-center gap-2 text-green-600">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    <span class="font-medium">
+                        In Stock
+                    </span>
+
+                </div>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    ${variation.stock_qty} items available
+                </p>
+            `;
+
+            quantity.max = variation.stock_qty;
+
+            purchaseSection.classList.remove('hidden');
+
+            detailAvailability.textContent = 'In Stock';
+
+            detailAvailability.classList.remove(
+                'text-red-600'
+            );
+
+            detailAvailability.classList.add(
+                'text-green-600'
+            );
+
+        } else {
+
+            stockInformation.innerHTML = `
+
+                <div class="flex items-center gap-2 text-red-600">
+
+                    <i class="fa-solid fa-circle-xmark"></i>
+
+                    <span class="font-medium">
+                        Out of Stock
+                    </span>
+
+                </div>
+            `;
+
+            purchaseSection.classList.add('hidden');
+
+            detailAvailability.textContent = 'Out of Stock';
+
+            detailAvailability.classList.remove(
+                'text-green-600'
+            );
+
+            detailAvailability.classList.add(
+                'text-red-600'
+            );
+        }
+    }
+
+    function increaseQuantity()
+    {
+        const quantity =
+            document.getElementById('quantity');
+
+        if (!quantity) {
+            return;
+        }
+
+        const max =
+            parseInt(quantity.max);
+
+        const current =
+            parseInt(quantity.value) || 1;
 
         if (current < max) {
             quantity.value = current + 1;
         }
-
     }
 
+    function decreaseQuantity()
+    {
+        const quantity =
+            document.getElementById('quantity');
 
-    function decreaseQuantity() {
+        if (!quantity) {
+            return;
+        }
 
-        const quantity = document.getElementById('quantity');
-
-        if (!quantity) return;
-
-        const current = parseInt(quantity.value);
+        const current =
+            parseInt(quantity.value) || 1;
 
         if (current > 1) {
             quantity.value = current - 1;
         }
-
     }
-
 </script>
 
 @endsection
-

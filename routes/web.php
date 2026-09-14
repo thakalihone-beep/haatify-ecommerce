@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\VendorController;
@@ -56,3 +57,20 @@ Route::get('/google/redirect', [AuthController::class, 'redirect'])
 
 Route::get('/google/callback', [AuthController::class, 'callback'])
     ->name('google.callback');
+
+//cart
+Route::middleware('auth')->group(function () {
+
+    Route::get('/cart', [CartController::class, 'index'])
+        ->name('cart.index');
+
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])
+        ->name('cart.add');
+
+    Route::patch('/cart/item/{cartItem}', [CartController::class, 'update'])
+        ->name('cart.update');
+
+    Route::delete('/cart/item/{cartItem}', [CartController::class, 'remove'])
+        ->name('cart.remove');
+
+});
