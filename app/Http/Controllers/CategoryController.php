@@ -16,6 +16,15 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        return view('frontend.category.show', compact('category'));
+        $products = $category->products()
+            ->with('category')
+            ->where('status', 'active')
+            ->latest()
+            ->get();
+
+        return view('frontend.category.show', compact(
+            'category',
+            'products'
+        ));
     }
 }

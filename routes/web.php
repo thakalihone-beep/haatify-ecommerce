@@ -7,38 +7,52 @@ use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/', [PageController::class, 'index'])->name('home');
-Route::get('/', [PageController::class, 'productCard'])
-    ->name('productCard');
+// Home
+Route::get('/', [PageController::class, 'index'])
+    ->name('home');
 
+
+// Products
+Route::get('/product/{product:slug}', [PageController::class, 'show'])
+    ->name('product.show');
+
+
+// Categories
 Route::get('/categories', [CategoryController::class, 'index'])
     ->name('categories.index');
+
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])
     ->name('categories.show');
 
+
+// Authentication
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login');
+
 Route::get('/register', [AuthController::class, 'showRegister'])
     ->name('register');
+
 Route::post('/login', [AuthController::class, 'login'])
     ->name('login.submit');
+
 Route::post('/register', [AuthController::class, 'register'])
     ->name('register.submit');
+
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
+
+// Vendor
 Route::get('/vendor/register', [VendorController::class, 'showRegister'])
     ->name('vendor.register');
+
 Route::post('/vendor/register', [VendorController::class, 'store'])
     ->name('vendor.register.submit');
 
 
-
+// Google Login
 Route::get('/google/redirect', [AuthController::class, 'redirect'])
     ->name('google.redirect');
 
 Route::get('/google/callback', [AuthController::class, 'callback'])
     ->name('google.callback');
-
-Route::get('/product/{product:slug}', [PageController::class, 'show'])
-    ->name('product.show');

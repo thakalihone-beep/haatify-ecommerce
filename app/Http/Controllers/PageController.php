@@ -9,22 +9,19 @@ class PageController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::latest()->get();
 
-        return view('frontend.home', compact('categories'));
-    }
-
-    public function productCard()
-    {
         $products = Product::with('category')
             ->where('status', 'active')
             ->latest()
             ->get();
 
-        $categories = Category::latest()->get();
-
-        return view('frontend.home', compact('products', 'categories'));
+        return view('frontend.home', compact(
+            'categories',
+            'products'
+        ));
     }
+
     public function show(Product $product)
     {
         $product->load('category');

@@ -12,7 +12,7 @@
 
         {{-- Breadcrumb --}}
         <div class="mb-6 text-sm text-gray-500">
-            <a href="/" class="hover:text-orange-500">
+            <a href="{{route('home')}}" class="hover:text-orange-500">
                 Home
             </a>
 
