@@ -27,17 +27,19 @@ Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])
 
 
 // Authentication
-Route::get('/login', [AuthController::class, 'showLogin'])
-    ->name('login');
+Route::middleware('unauth')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])
+        ->name('login');
 
-Route::get('/register', [AuthController::class, 'showRegister'])
-    ->name('register');
+    Route::get('/register', [AuthController::class, 'showRegister'])
+        ->name('register');
 
-Route::post('/login', [AuthController::class, 'login'])
-    ->name('login.submit');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->name('login.submit');
 
-Route::post('/register', [AuthController::class, 'register'])
-    ->name('register.submit');
+    Route::post('/register', [AuthController::class, 'register'])
+        ->name('register.submit');
+});
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
@@ -72,5 +74,4 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/cart/item/{cartItem}', [CartController::class, 'remove'])
         ->name('cart.remove');
-
 });
