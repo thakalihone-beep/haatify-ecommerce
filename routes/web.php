@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
@@ -60,9 +61,9 @@ Route::get('/google/redirect', [AuthController::class, 'redirect'])
 Route::get('/google/callback', [AuthController::class, 'callback'])
     ->name('google.callback');
 
-//cart
+//cart and checkout
 Route::middleware('auth')->group(function () {
-
+    // Cart
     Route::get('/cart', [CartController::class, 'index'])
         ->name('cart.index');
 
@@ -74,4 +75,16 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/cart/item/{cartItem}', [CartController::class, 'remove'])
         ->name('cart.remove');
+
+
+    // Checkout
+    Route::get('/checkout', [CheckoutController::class, 'index'])
+        ->name('checkout.index');
+
+    Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])
+        ->name('checkout.place');
+
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
+        ->name('checkout.success');
+
 });
