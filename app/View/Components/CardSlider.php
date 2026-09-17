@@ -11,7 +11,7 @@ class CardSlider extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct(public $categories = [])
     {
         //
     }
@@ -21,6 +21,8 @@ class CardSlider extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.card-slider');
+        return view('components.card-slider', [
+            'categories' => $this->categories,
+        ]);
     }
 }

@@ -1,752 +1,340 @@
-<div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
+<div class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
 
-    <!-- ===================================================== -->
     <!-- SECTION HEADER -->
-    <!-- ===================================================== -->
-
-    <div class="text-center mb-8">
-
-        <p class="text-sm uppercase tracking-[0.3em] text-gray-500 mb-2">
-            Explore
-        </p>
-
-        <h2 class="text-2xl sm:text-3xl font-black text-gray-900">
+    <div class="text-center mb-4">
+        <h2 class="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
             Shop by Category
         </h2>
-
-        <p class="mt-2 text-gray-500 text-sm sm:text-base">
-            Discover products from your favorite categories
-        </p>
-
+        <p class="text-sm text-gray-500 mt-1">Browse our curated collections</p>
     </div>
 
-
-    <!-- ===================================================== -->
     <!-- SLIDER AREA -->
-    <!-- ===================================================== -->
-
-    <div
-        id="categorySliderArea"
-        class="relative h-[430px] sm:h-[460px] flex items-center justify-center overflow-hidden"
-        style="perspective: 1600px;"
-    >
-
+    <div id="categorySliderArea"
+        class="relative h-[430px] sm:h-[460px] flex items-center justify-center overflow-hidden outline-none"
+        style="perspective: 1600px;" tabindex="0" role="region" aria-roledescription="carousel"
+        aria-label="Product categories">
         @forelse ($categories ?? collect() as $category)
-
-            <!-- ================================================= -->
-            <!-- CATEGORY CARD - JAVASCRIPT CONTROLS THIS -->
-            <!-- ================================================= -->
-
-            <div
-                class="category-card absolute
+            <div class="category-card absolute
                        w-[230px] sm:w-[270px]
                        h-[330px] sm:h-[370px]
                        select-none
-                       transition-all duration-700
-                       ease-[cubic-bezier(.22,.61,.36,1)]"
-            >
-
-                <!-- ================================================= -->
-                <!-- CARD INNER - HOVER CONTROLS THIS -->
-                <!-- ================================================= -->
-
+                       [will-change:transform,opacity]
+                       transition-[transform,opacity,filter]
+                       duration-500
+                       ease-[cubic-bezier(.25,.8,.35,1)]"
+                role="group" aria-roledescription="slide" aria-label="{{ $category->name }}">
                 <div
-                    class="category-card-inner
+                    class="category-card-inner group
                            relative w-full h-full
                            rounded-3xl overflow-hidden
-                           bg-white
-                           shadow-[0_25px_70px_rgba(0,0,0,0.18)]
-                           border border-gray-200
-                           transition-transform duration-300
-                           ease-out
-                           hover:scale-[1.03]"
-                >
-
-                    <!-- ============================================= -->
-                    <!-- CATEGORY LINK -->
-                    <!-- ============================================= -->
-
-                    <a
-                        href="{{ route('categories.show', $category->slug) }}"
-                        class="block relative w-full h-full"
-                    >
-
-                        <!-- ========================================= -->
-                        <!-- IMAGE -->
-                        <!-- ========================================= -->
-
-                        <img
-                            src="{{ $category->image
-                                ? asset('storage/' . ltrim($category->image, '/'))
-                                : asset('frontend/image/amazon1.jpg') }}"
-                            alt="{{ $category->name }}"
-                            class="category-image w-full h-full object-cover"
-                        >
-
-
-                        <!-- ========================================= -->
-                        <!-- IMAGE GRADIENT -->
-                        <!-- ========================================= -->
+                           bg-gray-100
+                           shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)]
+                           ring-1 ring-gray-200/70
+                           transition-transform duration-300 ease-out
+                           hover:scale-[1.035]
+                           focus-within:scale-[1.035]">
+                    <a href="{{ route('categories.show', $category->slug) }}"
+                        class="block relative w-full h-full rounded-3xl
+                               focus:outline-none focus-visible:ring-4 focus-visible:ring-gray-900/40">
+                        <img src="{{ $category->image ? asset('storage/' . ltrim($category->image, '/')) : asset('frontend/image/amazon1.jpg') }}"
+                            alt="{{ $category->name }}" loading="lazy" decoding="async"
+                            class="category-image w-full h-full object-cover
+                                   transition-transform duration-700 ease-out
+                                   group-hover:scale-105">
 
                         <div
                             class="absolute inset-0
                                    bg-gradient-to-t
-                                   from-black/90
-                                   via-black/20
-                                   to-transparent
-                                   pointer-events-none"
-                        ></div>
+                                   from-black/85 via-black/25 to-black/0
+                                   pointer-events-none">
+                        </div>
 
-
-                        <!-- ========================================= -->
-                        <!-- CATEGORY CONTENT -->
-                        <!-- ========================================= -->
-
-                        <div
-                            class="absolute bottom-0 left-0 right-0
-                                   p-5 sm:p-6
-                                   text-white"
-                        >
-
-                            <!-- ===================================== -->
-                            <!-- CATEGORY NAME -->
-                            <!-- ===================================== -->
-
-                            <h3
-                                class="text-2xl sm:text-3xl
-                                       font-black
-                                       leading-tight
-                                       truncate"
-                            >
+                        <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-6 text-white">
+                            <h3 class="text-2xl sm:text-3xl font-black leading-tight truncate drop-shadow-sm">
                                 {{ $category->name }}
                             </h3>
 
-
-                            <!-- ===================================== -->
-                            <!-- DESCRIPTION -->
-                            <!-- ===================================== -->
-
-                            <p
-                                class="mt-1
-                                       text-sm
-                                       text-gray-200"
-                            >
+                            <p class="mt-1 text-sm text-gray-200/90">
                                 Explore {{ $category->name }}
                             </p>
 
-
-                            <!-- ===================================== -->
-                            <!-- VIEW BUTTON -->
-                            <!-- ===================================== -->
-
                             <div class="mt-4">
-
                                 <span
-                                    class="inline-flex items-center gap-2
+                                    class="group/btn inline-flex items-center gap-2
                                            text-sm font-semibold
-                                           group"
-                                >
-
+                                           bg-white/10 backdrop-blur-sm
+                                           px-3 py-1.5 rounded-full
+                                           border border-white/20
+                                           transition-colors duration-300
+                                           hover:bg-white/20">
                                     View Category
-
                                     <span
-                                        class="text-lg
-                                               transition-transform
-                                               duration-300
-                                               group-hover:translate-x-1"
-                                    >
+                                        class="text-lg transition-transform duration-300 group-hover/btn:translate-x-1">
                                         →
                                     </span>
-
                                 </span>
-
                             </div>
-
                         </div>
-
                     </a>
-
                 </div>
-
             </div>
-
         @empty
-
-            <!-- ================================================= -->
-            <!-- EMPTY STATE -->
-            <!-- ================================================= -->
-
             <div class="text-center">
-
-                <div
-                    class="w-16 h-16 mx-auto mb-4
-                           rounded-full
-                           bg-gray-100
-                           flex items-center justify-center"
-                >
-                    <span class="text-2xl">
-                        📦
-                    </span>
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                    <span class="text-2xl">📦</span>
                 </div>
-
-                <p class="text-gray-500">
-                    No categories available.
-                </p>
-
+                <p class="text-gray-500">No categories available.</p>
             </div>
-
         @endforelse
-
     </div>
 
+    <!-- PREV -->
+    <button id="categoryPrev" type="button" aria-label="Previous category"
+        class="absolute left-2 sm:left-6 top-[55%] -translate-y-1/2
+               w-11 h-11 sm:w-14 sm:h-14 rounded-full
+               bg-white/90 backdrop-blur text-gray-900
+               shadow-xl border border-gray-200
+               flex items-center justify-center text-xl sm:text-2xl
+               transition-all duration-200 ease-out
+               hover:scale-110 hover:bg-gray-900 hover:text-white
+               active:scale-95
+               focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-900/30
+               z-30">←</button>
 
-    <!-- ===================================================== -->
-    <!-- PREVIOUS BUTTON -->
-    <!-- ===================================================== -->
+    <!-- NEXT -->
+    <button id="categoryNext" type="button" aria-label="Next category"
+        class="absolute right-2 sm:right-6 top-[55%] -translate-y-1/2
+               w-11 h-11 sm:w-14 sm:h-14 rounded-full
+               bg-white/90 backdrop-blur text-gray-900
+               shadow-xl border border-gray-200
+               flex items-center justify-center text-xl sm:text-2xl
+               transition-all duration-200 ease-out
+               hover:scale-110 hover:bg-gray-900 hover:text-white
+               active:scale-95
+               focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-900/30
+               z-30">→</button>
 
-    <button
-        id="categoryPrev"
-        type="button"
-        aria-label="Previous category"
-        class="absolute left-2 sm:left-6 top-[55%]
-               -translate-y-1/2
-               w-11 h-11 sm:w-14 sm:h-14
-               rounded-full
-               bg-white
-               text-gray-900
-               shadow-xl
-               border border-gray-200
-               flex items-center justify-center
-               text-xl sm:text-2xl
-               transition-all duration-300
-               hover:scale-110
-               hover:bg-gray-900
-               hover:text-white
-               z-30"
-    >
-        ←
-    </button>
+    <!-- DOTS -->
+    <div id="categoryDots" class="flex justify-center items-center gap-2 mt-6"></div>
 
-
-    <!-- ===================================================== -->
-    <!-- NEXT BUTTON -->
-    <!-- ===================================================== -->
-
-    <button
-        id="categoryNext"
-        type="button"
-        aria-label="Next category"
-        class="absolute right-2 sm:right-6 top-[55%]
-               -translate-y-1/2
-               w-11 h-11 sm:w-14 sm:h-14
-               rounded-full
-               bg-white
-               text-gray-900
-               shadow-xl
-               border border-gray-200
-               flex items-center justify-center
-               text-xl sm:text-2xl
-               transition-all duration-300
-               hover:scale-110
-               hover:bg-gray-900
-               hover:text-white
-               z-30"
-    >
-        →
-    </button>
-
-
-    <!-- ===================================================== -->
-    <!-- DOT INDICATORS -->
-    <!-- ===================================================== -->
-
-    <div
-        id="categoryDots"
-        class="flex justify-center items-center gap-2 mt-6"
-    ></div>
-
+    <!-- Screen-reader live announcement -->
+    <div id="categoryLiveRegion" class="sr-only" aria-live="polite"></div>
 </div>
 
-
-
-<!-- ========================================================= -->
-<!-- JAVASCRIPT -->
-<!-- ========================================================= -->
-
 <script>
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    /* =========================================================
-       ELEMENTS
-    ========================================================= */
-
-    const cards = document.querySelectorAll(".category-card");
-
-    const prevButton = document.getElementById("categoryPrev");
-
-    const nextButton = document.getElementById("categoryNext");
-
-    const dotsContainer = document.getElementById("categoryDots");
-
-    const sliderArea = document.getElementById("categorySliderArea");
-
-    const totalCards = cards.length;
-
-    let current = 0;
-
-
-    /* =========================================================
-       STOP IF THERE ARE NO CARDS
-    ========================================================= */
-
-    if (totalCards === 0) {
-
-        prevButton.style.display = "none";
-
-        nextButton.style.display = "none";
-
-        return;
-    }
-
-
-    /* =========================================================
-       CREATE DOTS
-    ========================================================= */
-
-    cards.forEach((card, index) => {
-
-        const dot = document.createElement("button");
-
-        dot.type = "button";
-
-        dot.className =
-            "category-dot w-2 h-2 rounded-full bg-gray-300 " +
-            "transition-all duration-300";
-
-        dot.setAttribute(
-            "aria-label",
-            "Go to category " + (index + 1)
-        );
-
-
-        dot.addEventListener("click", function () {
-
-            current = index;
-
-            updateSlider();
-
-        });
-
-
-        dotsContainer.appendChild(dot);
-
-    });
-
-
-    const dots = document.querySelectorAll(".category-dot");
-
-
-    /* =========================================================
-       CALCULATE CIRCULAR POSITION
-    ========================================================= */
-
-    function getPosition(index) {
-
-        let position = index - current;
-
-        const half = Math.floor(totalCards / 2);
-
-
-        if (position > half) {
-
-            position -= totalCards;
-
-        }
-
-
-        if (position < -half) {
-
-            position += totalCards;
-
-        }
-
-
-        return position;
-
-    }
-
-
-    /* =========================================================
-       UPDATE SLIDER
-    ========================================================= */
-
-    function updateSlider() {
-
-        cards.forEach((card, index) => {
-
-            const position = getPosition(index);
-
-
-            /* =================================================
-               CENTER
-            ================================================= */
-
-            if (position === 0) {
-
-                card.style.transform =
-                    "translateX(0px) " +
-                    "translateZ(180px) " +
-                    "rotateY(0deg) " +
-                    "scale(1)";
-
-                card.style.opacity = "1";
-
-                card.style.zIndex = "20";
-
-                card.style.filter = "brightness(1)";
-
-            }
-
-
-            /* =================================================
-               RIGHT
-            ================================================= */
-
-            else if (position === 1) {
-
-                card.style.transform =
-                    "translateX(245px) " +
-                    "translateZ(20px) " +
-                    "rotateY(-32deg) " +
-                    "scale(.84)";
-
-                card.style.opacity = ".85";
-
-                card.style.zIndex = "10";
-
-                card.style.filter = "brightness(.85)";
-
-            }
-
-
-            /* =================================================
-               LEFT
-            ================================================= */
-
-            else if (position === -1) {
-
-                card.style.transform =
-                    "translateX(-245px) " +
-                    "translateZ(20px) " +
-                    "rotateY(32deg) " +
-                    "scale(.84)";
-
-                card.style.opacity = ".85";
-
-                card.style.zIndex = "10";
-
-                card.style.filter = "brightness(.85)";
-
-            }
-
-
-            /* =================================================
-               FAR RIGHT
-            ================================================= */
-
-            else if (position === 2) {
-
-                card.style.transform =
-                    "translateX(430px) " +
-                    "translateZ(-180px) " +
-                    "rotateY(-55deg) " +
-                    "scale(.65)";
-
-                card.style.opacity = ".35";
-
-                card.style.zIndex = "5";
-
-                card.style.filter = "brightness(.65)";
-
-            }
-
-
-            /* =================================================
-               FAR LEFT
-            ================================================= */
-
-            else if (position === -2) {
-
-                card.style.transform =
-                    "translateX(-430px) " +
-                    "translateZ(-180px) " +
-                    "rotateY(55deg) " +
-                    "scale(.65)";
-
-                card.style.opacity = ".35";
-
-                card.style.zIndex = "5";
-
-                card.style.filter = "brightness(.65)";
-
-            }
-
-
-            /* =================================================
-               HIDE VERY FAR CARDS
-            ================================================= */
-
-            else {
-
-                card.style.transform =
-                    "translateX(0px) " +
-                    "translateZ(-500px) " +
-                    "scale(.4)";
-
-                card.style.opacity = "0";
-
-                card.style.zIndex = "0";
-
-            }
-
-        });
-
-
-        /* =====================================================
-           UPDATE DOTS
-        ===================================================== */
-
-        dots.forEach((dot, index) => {
-
-            if (index === current) {
-
-                dot.classList.remove(
-                    "w-2",
-                    "bg-gray-300"
-                );
-
-                dot.classList.add(
-                    "w-7",
-                    "bg-gray-900"
-                );
-
-            } else {
-
-                dot.classList.remove(
-                    "w-7",
-                    "bg-gray-900"
-                );
-
-                dot.classList.add(
-                    "w-2",
-                    "bg-gray-300"
-                );
-
-            }
-
-        });
-
-    }
-
-
-    /* =========================================================
-       NEXT
-    ========================================================= */
-
-    nextButton.addEventListener("click", function () {
-
-        current++;
-
-        if (current >= totalCards) {
-
-            current = 0;
-
-        }
-
-        updateSlider();
-
-    });
-
-
-    /* =========================================================
-       PREVIOUS
-    ========================================================= */
-
-    prevButton.addEventListener("click", function () {
-
-        current--;
-
-        if (current < 0) {
-
-            current = totalCards - 1;
-
-        }
-
-        updateSlider();
-
-    });
-
-
-    /* =========================================================
-       KEYBOARD CONTROL
-    ========================================================= */
-
-    document.addEventListener("keydown", function (event) {
-
-        if (event.key === "ArrowRight") {
-
-            nextButton.click();
-
-        }
-
-
-        if (event.key === "ArrowLeft") {
-
-            prevButton.click();
-
-        }
-
-    });
-
-
-    /* =========================================================
-       TOUCH / SWIPE
-    ========================================================= */
-
-    let touchStartX = 0;
-
-    let touchEndX = 0;
-
-
-    sliderArea.addEventListener(
-        "touchstart",
-        function (event) {
-
-            touchStartX =
-                event.changedTouches[0].screenX;
-
-        },
-        { passive: true }
-    );
-
-
-    sliderArea.addEventListener(
-        "touchend",
-        function (event) {
-
-            touchEndX =
-                event.changedTouches[0].screenX;
-
-            handleSwipe();
-
-        },
-        { passive: true }
-    );
-
-
-    function handleSwipe() {
-
-        const distance =
-            touchEndX - touchStartX;
-
-
-        if (Math.abs(distance) < 50) {
-
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const cards = document.querySelectorAll(".category-card");
+        const prevButton = document.getElementById("categoryPrev");
+        const nextButton = document.getElementById("categoryNext");
+        const dotsContainer = document.getElementById("categoryDots");
+        const sliderArea = document.getElementById("categorySliderArea");
+        const liveRegion = document.getElementById("categoryLiveRegion");
+        const totalCards = cards.length;
+
+        let current = 0;
+        let autoPlay = null;
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        if (totalCards === 0) {
+            prevButton.style.display = "none";
+            nextButton.style.display = "none";
             return;
-
         }
 
-
-        if (distance < 0) {
-
-            nextButton.click();
-
-        } else {
-
-            prevButton.click();
-
-        }
-
-    }
-
-
-    /* =========================================================
-       AUTO PLAY
-    ========================================================= */
-
-    let autoPlay = setInterval(function () {
-
-        current++;
-
-        if (current >= totalCards) {
-
-            current = 0;
-
-        }
-
-        updateSlider();
-
-    }, 5000);
-
-
-    /* =========================================================
-       PAUSE WHEN MOUSE IS OVER SLIDER
-    ========================================================= */
-
-    sliderArea.addEventListener(
-        "mouseenter",
-        function () {
-
-            clearInterval(autoPlay);
-
-        }
-    );
-
-
-    sliderArea.addEventListener(
-        "mouseleave",
-        function () {
-
-            autoPlay = setInterval(function () {
-
-                current++;
-
-                if (current >= totalCards) {
-
-                    current = 0;
-
-                }
-
+        // Build dots
+        cards.forEach((card, index) => {
+            const dot = document.createElement("button");
+            dot.type = "button";
+            dot.className =
+                "category-dot w-2 h-2 rounded-full bg-gray-300 transition-all duration-300 " +
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900/40";
+            dot.setAttribute("aria-label", "Go to category " + (index + 1));
+            dot.addEventListener("click", () => {
+                current = index;
                 updateSlider();
+                restartAutoPlay();
+            });
+            dotsContainer.appendChild(dot);
+        });
 
-            }, 5000);
+        const dots = document.querySelectorAll(".category-dot");
 
+        // Layout config per relative position
+        const layout = {
+            0: {
+                x: 0,
+                z: 180,
+                ry: 0,
+                scale: 1,
+                opacity: 1,
+                zIndex: 20,
+                brightness: 1
+            },
+            1: {
+                x: 245,
+                z: 20,
+                ry: -32,
+                scale: .84,
+                opacity: .85,
+                zIndex: 10,
+                brightness: .85
+            },
+            [-1]: {
+                x: -245,
+                z: 20,
+                ry: 32,
+                scale: .84,
+                opacity: .85,
+                zIndex: 10,
+                brightness: .85
+            },
+            2: {
+                x: 430,
+                z: -180,
+                ry: -55,
+                scale: .65,
+                opacity: .35,
+                zIndex: 5,
+                brightness: .65
+            },
+            [-2]: {
+                x: -430,
+                z: -180,
+                ry: 55,
+                scale: .65,
+                opacity: .35,
+                zIndex: 5,
+                brightness: .65
+            },
+        };
+
+        function getPosition(index) {
+            let position = index - current;
+            const half = Math.floor(totalCards / 2);
+            if (position > half) position -= totalCards;
+            if (position < -half) position += totalCards;
+            return position;
         }
-    );
 
+        function updateSlider() {
+            cards.forEach((card, index) => {
+                const position = getPosition(index);
+                const cfg = layout[position];
 
-    /* =========================================================
-       INITIALIZE
-    ========================================================= */
+                if (cfg) {
+                    card.style.transform =
+                        `translateX(${cfg.x}px) translateZ(${cfg.z}px) rotateY(${cfg.ry}deg) scale(${cfg.scale})`;
+                    card.style.opacity = cfg.opacity;
+                    card.style.zIndex = cfg.zIndex;
+                    card.style.filter = `brightness(${cfg.brightness})`;
+                    card.setAttribute("aria-hidden", position === 0 ? "false" : "true");
+                } else {
+                    card.style.transform = "translateX(0px) translateZ(-500px) scale(.4)";
+                    card.style.opacity = "0";
+                    card.style.zIndex = "0";
+                    card.setAttribute("aria-hidden", "true");
+                }
+            });
 
-    updateSlider();
+            dots.forEach((dot, index) => {
+                const active = index === current;
+                dot.classList.toggle("w-2", !active);
+                dot.classList.toggle("bg-gray-300", !active);
+                dot.classList.toggle("w-7", active);
+                dot.classList.toggle("bg-gray-900", active);
+                dot.setAttribute("aria-current", active ? "true" : "false");
+            });
 
+            const activeCard = cards[current];
+            const name = activeCard?.getAttribute("aria-label") || "";
+            if (liveRegion) liveRegion.textContent = name ? `Showing ${name}` : "";
+        }
 
-    /* =========================================================
-       DISABLE CONTROLS IF ONLY ONE CATEGORY
-    ========================================================= */
+        function goNext() {
+            current = (current + 1) % totalCards;
+            updateSlider();
+        }
 
-    if (totalCards <= 1) {
+        function goPrev() {
+            current = (current - 1 + totalCards) % totalCards;
+            updateSlider();
+        }
 
-        prevButton.style.display = "none";
+        nextButton.addEventListener("click", () => {
+            goNext();
+            restartAutoPlay();
+        });
+        prevButton.addEventListener("click", () => {
+            goPrev();
+            restartAutoPlay();
+        });
 
-        nextButton.style.display = "none";
+        sliderArea.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowRight") {
+                goNext();
+                restartAutoPlay();
+            }
+            if (event.key === "ArrowLeft") {
+                goPrev();
+                restartAutoPlay();
+            }
+        });
 
-        dotsContainer.style.display = "none";
+        // Swipe
+        let touchStartX = 0;
+        sliderArea.addEventListener("touchstart", (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            pauseAutoPlay();
+        }, {
+            passive: true
+        });
 
-    }
+        sliderArea.addEventListener("touchend", (e) => {
+            const distance = e.changedTouches[0].screenX - touchStartX;
+            if (Math.abs(distance) >= 50) {
+                distance < 0 ? goNext() : goPrev();
+            }
+            restartAutoPlay();
+        }, {
+            passive: true
+        });
 
-});
+        // Autoplay controls
+        function startAutoPlay() {
+            if (prefersReducedMotion || totalCards <= 1) return;
+            autoPlay = setInterval(goNext, 5000);
+        }
 
+        function pauseAutoPlay() {
+            clearInterval(autoPlay);
+        }
+
+        function restartAutoPlay() {
+            pauseAutoPlay();
+            startAutoPlay();
+        }
+
+        sliderArea.addEventListener("mouseenter", pauseAutoPlay);
+        sliderArea.addEventListener("mouseleave", startAutoPlay);
+        sliderArea.addEventListener("focusin", pauseAutoPlay);
+        sliderArea.addEventListener("focusout", startAutoPlay);
+
+        document.addEventListener("visibilitychange", () => {
+            document.hidden ? pauseAutoPlay() : startAutoPlay();
+        });
+
+        // Init
+        updateSlider();
+        startAutoPlay();
+
+        if (totalCards <= 1) {
+            prevButton.style.display = "none";
+            nextButton.style.display = "none";
+            dotsContainer.style.display = "none";
+        }
+    });
 </script>

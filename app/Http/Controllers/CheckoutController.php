@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Payment;
-use App\Models\ShippingAddress;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,9 +22,15 @@ class CheckoutController extends Controller
             abort(401);
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Get Cart
+        |--------------------------------------------------------------------------
+        */
+
         $cart = $user->cart;
 
-        if (! $cart || $cart->items->isEmpty()) {
+        if (! $cart) {
             return redirect()
                 ->route('cart.index')
                 ->with('error', 'Your cart is empty.');
@@ -38,25 +41,51 @@ class CheckoutController extends Controller
             'items.variation',
         ]);
 
-        // Calculate subtotal
+        if ($cart->items->isEmpty()) {
+            return redirect()
+                ->route('cart.index')
+                ->with('error', 'Your cart is empty.');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate Subtotal
+        |--------------------------------------------------------------------------
+        */
+
         $subtotal = $cart->items->sum(function ($item) {
             return $item->price * $item->quantity;
         });
 
-        // Get user's saved addresses
+        /*
+        |--------------------------------------------------------------------------
+        | Get Saved Shipping Addresses
+        |--------------------------------------------------------------------------
+        */
+
         $addresses = $user->shippingAddresses()
             ->latest()
             ->get();
 
-        return view('frontend.checkout.index', compact(
-            'cart',
-            'subtotal',
-            'addresses'
-        ));
+        /*
+        |--------------------------------------------------------------------------
+        | Show Checkout Page
+        |--------------------------------------------------------------------------
+        */
+
+        return view(
+            'frontend.checkout.index',
+            compact(
+                'cart',
+                'subtotal',
+                'addresses'
+            )
+        );
     }
 
+
     /**
-     * Place order
+     * Place Order
      */
     public function placeOrder(Request $request)
     {
@@ -67,12 +96,90 @@ class CheckoutController extends Controller
             abort(401);
         }
 
-        $request->validate([
+        /*
+        |--------------------------------------------------------------------------
+        | Validate Checkout Form
+        |--------------------------------------------------------------------------
+        */
+
+        $validated = $request->validate([
+
+            /*
+            |--------------------------------------------------------------------------
+            | Existing Address
+            |--------------------------------------------------------------------------
+            */
+
             'shipping_address_id' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:shipping_addresses,id',
             ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | New Address
+            |--------------------------------------------------------------------------
+            */
+
+            'new_full_name' => [
+                'nullable',
+                'required_without:shipping_address_id',
+                'string',
+                'max:255',
+            ],
+
+            'new_phone' => [
+                'nullable',
+                'required_without:shipping_address_id',
+                'string',
+                'max:20',
+            ],
+
+            'new_address_line_1' => [
+                'nullable',
+                'required_without:shipping_address_id',
+                'string',
+                'max:255',
+            ],
+
+            'new_address_line_2' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'new_city' => [
+                'nullable',
+                'required_without:shipping_address_id',
+                'string',
+                'max:100',
+            ],
+
+            'new_state' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'new_postal_code' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
+            'new_country' => [
+                'nullable',
+                'required_without:shipping_address_id',
+                'string',
+                'max:100',
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Payment
+            |--------------------------------------------------------------------------
+            */
 
             'payment_method' => [
                 'required',
@@ -80,14 +187,16 @@ class CheckoutController extends Controller
             ],
         ]);
 
-        // Security: make sure address belongs to logged-in user
-        $address = $user->shippingAddresses()
-            ->where('id', $request->shipping_address_id)
-            ->firstOrFail();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Get Cart
+        |--------------------------------------------------------------------------
+        */
 
         $cart = $user->cart;
 
-        if (! $cart || $cart->items->isEmpty()) {
+        if (! $cart) {
             return redirect()
                 ->route('cart.index')
                 ->with('error', 'Your cart is empty.');
@@ -98,27 +207,89 @@ class CheckoutController extends Controller
             'items.variation',
         ]);
 
+        if ($cart->items->isEmpty()) {
+            return redirect()
+                ->route('cart.index')
+                ->with('error', 'Your cart is empty.');
+        }
+
+
         /*
         |--------------------------------------------------------------------------
-        | Calculate subtotal
+        | Get Existing Address OR Create New Address
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('shipping_address_id')) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Existing Address
+            |--------------------------------------------------------------------------
+            */
+
+            $address = $user->shippingAddresses()
+                ->where('id', $validated['shipping_address_id'])
+                ->firstOrFail();
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create New Address
+            |--------------------------------------------------------------------------
+            */
+
+            $address = $user->shippingAddresses()->create([
+
+                'full_name' => $validated['new_full_name'],
+
+                'phone' => $validated['new_phone'],
+
+                'address_line_1' =>
+                    $validated['new_address_line_1'],
+
+                'address_line_2' =>
+                    $validated['new_address_line_2'] ?? null,
+
+                'city' =>
+                    $validated['new_city'],
+
+                'state' =>
+                    $validated['new_state'] ?? null,
+
+                'postal_code' =>
+                    $validated['new_postal_code'] ?? null,
+
+                'country' =>
+                    $validated['new_country'] ?? 'Nepal',
+
+                'is_default' => false,
+            ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Calculate Subtotal
         |--------------------------------------------------------------------------
         */
 
         $subtotal = $cart->items->sum(function ($item) {
+
             return $item->price * $item->quantity;
+
         });
+
 
         /*
         |--------------------------------------------------------------------------
-        | Shipping
+        | Shipping Fee
         |--------------------------------------------------------------------------
-        |
-        | For now we use a fixed shipping fee.
-        | You can make this dynamic later.
-        |
         */
 
         $shippingFee = 100;
+
 
         /*
         |--------------------------------------------------------------------------
@@ -128,6 +299,7 @@ class CheckoutController extends Controller
 
         $discountAmount = 0;
 
+
         /*
         |--------------------------------------------------------------------------
         | Tax
@@ -136,9 +308,10 @@ class CheckoutController extends Controller
 
         $taxAmount = 0;
 
+
         /*
         |--------------------------------------------------------------------------
-        | Final total
+        | Final Total
         |--------------------------------------------------------------------------
         */
 
@@ -148,9 +321,10 @@ class CheckoutController extends Controller
             + $taxAmount
             - $discountAmount;
 
+
         /*
         |--------------------------------------------------------------------------
-        | Create order
+        | Create Order
         |--------------------------------------------------------------------------
         */
 
@@ -163,109 +337,163 @@ class CheckoutController extends Controller
             $discountAmount,
             $taxAmount,
             $totalAmount,
-            $request
+            $validated
         ) {
-
-            $order = Order::create([
-                'user_id' => $user->id,
-
-                'shipping_address_id' => $address->id,
-
-                'order_number' => 'HAT-' . strtoupper(
-                    uniqid()
-                ),
-
-                'subtotal' => $subtotal,
-
-                'shipping_fee' => $shippingFee,
-
-                'discount_amount' => $discountAmount,
-
-                'tax_amount' => $taxAmount,
-
-                'total_amount' => $totalAmount,
-
-                'status' => 'pending',
-
-                'payment_status' => 'pending',
-            ]);
 
             /*
             |--------------------------------------------------------------------------
-            | Create order items
+            | Create Order
+            |--------------------------------------------------------------------------
+            */
+
+            $order = Order::create([
+
+                'user_id' =>
+                    $user->id,
+
+                'shipping_address_id' =>
+                    $address->id,
+
+                'order_number' =>
+                    'HAT-' . strtoupper(uniqid()),
+
+                'subtotal' =>
+                    $subtotal,
+
+                'shipping_fee' =>
+                    $shippingFee,
+
+                'discount_amount' =>
+                    $discountAmount,
+
+                'tax_amount' =>
+                    $taxAmount,
+
+                'total_amount' =>
+                    $totalAmount,
+
+                'status' =>
+                    'pending',
+
+                'payment_status' =>
+                    'pending',
+            ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create Order Items
             |--------------------------------------------------------------------------
             */
 
             foreach ($cart->items as $cartItem) {
 
-                $product = $cartItem->product;
-                $variation = $cartItem->variation;
+                $product =
+                    $cartItem->product;
+
+                $variation =
+                    $cartItem->variation;
+
 
                 $order->items()->create([
-                    'product_id' => $product->id,
 
-                    'product_variation_id' => $variation?->id,
+                    'product_id' =>
+                        $product->id,
 
-                    'product_name' => $product->name,
+                    'product_variation_id' =>
+                        $variation?->id,
 
-                    'variation_name' => $variation
-                        ? json_encode($variation->attributes)
-                        : null,
+                    'product_name' =>
+                        $product->name,
 
-                    'quantity' => $cartItem->quantity,
+                    'variation_name' =>
+                        $variation
+                            ? json_encode($variation->attributes)
+                            : null,
 
-                    'unit_price' => $cartItem->price,
+                    'quantity' =>
+                        $cartItem->quantity,
+
+                    'unit_price' =>
+                        $cartItem->price,
 
                     'total_price' =>
-                        $cartItem->price * $cartItem->quantity,
+                        $cartItem->price *
+                        $cartItem->quantity,
                 ]);
             }
 
+
             /*
             |--------------------------------------------------------------------------
-            | Create payment
+            | Create Payment
             |--------------------------------------------------------------------------
             */
 
             $order->payment()->create([
-                'payment_method' => $request->payment_method,
 
-                'amount' => $totalAmount,
+                'payment_method' =>
+                    $validated['payment_method'],
 
-                'status' => 'pending',
+                'amount' =>
+                    $totalAmount,
+
+                'status' =>
+                    'pending',
             ]);
+
 
             /*
             |--------------------------------------------------------------------------
-            | Clear cart
+            | Clear Cart
             |--------------------------------------------------------------------------
             */
 
             $cart->items()->delete();
 
+
             return $order;
         });
 
+
         /*
         |--------------------------------------------------------------------------
-        | Redirect to success page
+        | Redirect To Success Page
         |--------------------------------------------------------------------------
         */
 
         return redirect()
-            ->route('checkout.success', $order)
-            ->with('success', 'Your order has been placed successfully.');
+            ->route('checkout.success', [
+                'order' => $order->id,
+            ])
+            ->with(
+                'success',
+                'Your order has been placed successfully.'
+            );
     }
 
+
     /**
-     * Order success page
+     * Show Order Success Page
      */
     public function success(Order $order)
     {
-        // Security: only order owner can see this page
+        /*
+        |--------------------------------------------------------------------------
+        | Security
+        |--------------------------------------------------------------------------
+        */
+
         if ($order->user_id !== Auth::id()) {
             abort(403);
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Load Relationships
+        |--------------------------------------------------------------------------
+        */
 
         $order->load([
             'items.product',
@@ -274,10 +502,16 @@ class CheckoutController extends Controller
             'payment',
         ]);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Show Page
+        |--------------------------------------------------------------------------
+        */
+
         return view(
             'frontend.checkout.success',
             compact('order')
         );
     }
 }
-
