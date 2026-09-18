@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Filament\Vendor\Resources\Products;
+namespace App\Filament\Resources\Products;
 
-use App\Filament\Vendor\Resources\Products\Pages\CreateProduct;
-use App\Filament\Vendor\Resources\Products\Pages\EditProduct;
-use App\Filament\Vendor\Resources\Products\Pages\ListProducts;
-use App\Filament\Vendor\Resources\Products\Schemas\ProductForm;
-use App\Filament\Vendor\Resources\Products\Tables\ProductsTable;
+use App\Filament\Resources\Products\Pages\CreateProduct;
+use App\Filament\Resources\Products\Pages\EditProduct;
+use App\Filament\Resources\Products\Pages\ListProducts;
+use App\Filament\Resources\Products\Schemas\ProductForm;
+use App\Filament\Resources\Products\Tables\ProductsTable;
 use App\Models\Product;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
-use Override;
 
 class ProductResource extends Resource
 {
@@ -24,12 +21,6 @@ class ProductResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    #[Override]
-    public static function getEloquentQuery(): Builder
-    {
-        return Product::where('vendor_id', Auth::guard('vendor')->user()->id);
-    }
 
     public static function form(Schema $schema): Schema
     {
