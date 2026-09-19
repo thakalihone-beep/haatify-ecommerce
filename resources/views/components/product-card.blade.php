@@ -22,11 +22,15 @@
 
 
     {{-- Wishlist --}}
-    <button type="button"
-        class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-500 shadow-sm transition hover:bg-orange-500 hover:text-white dark:bg-gray-800/90"
-        title="Add to wishlist">
-        <i class="fa-regular fa-heart"></i>
-    </button>
+    <form action="{{ route('wishlist.store', $product->id) }}" method="POST">
+        @csrf
+
+        <button type="button"
+            class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-500 shadow-sm transition hover:bg-orange-500 hover:text-white dark:bg-gray-800/90"
+            title="Add to wishlist">
+            <i class="fa-regular fa-heart"></i>
+        </button>
+    </form>
 
 
     {{-- Product Image --}}

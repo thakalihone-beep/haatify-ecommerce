@@ -300,7 +300,7 @@
                             <div class="px-4 py-3 space-y-1">
 
                                 <!-- My Orders -->
-                                <a href="#"
+                                <a href=""
                                     class="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg hover:bg-gray-100 transition">
                                     <i class="fa-solid fa-box-open w-5 text-center text-gray-500"></i>
                                     <span class="text-sm font-medium">My Orders</span>
@@ -314,7 +314,7 @@
                                 </a>
 
                                 <!-- Wishlist -->
-                                <a href="#"
+                                <a href="{{route('wishlist.index')}}"
                                     class="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg hover:bg-gray-100 transition">
                                     <i class="fa-solid fa-heart w-5 text-center text-gray-500"></i>
                                     <span class="text-sm font-medium">Wishlist</span>
