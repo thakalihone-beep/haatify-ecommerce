@@ -519,7 +519,7 @@
                             <form action="{{ route('wishlist.store', $product->id) }}" method="POST">
                                 @csrf
 
-                                <button type="button"
+                                <button type="submit"
                                     class="w-full mt-3 border border-gray-300
                                hover:border-red-400
                                hover:text-red-500
