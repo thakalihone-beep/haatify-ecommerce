@@ -409,7 +409,7 @@
 
                                 <div class="text-gray-600 leading-relaxed">
 
-                                    {!! nl2br(e($product->description)) !!}
+                                    {!! $product->description !!}
 
                                 </div>
 
