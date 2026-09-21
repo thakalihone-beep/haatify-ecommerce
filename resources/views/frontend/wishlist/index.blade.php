@@ -71,7 +71,7 @@
 
                         @if($product)
 
-                            <a href="">
+                            <a href="{{ route('product.show', $product->slug) }}">
 
                                 <img
                                     src="{{ $image }}"
@@ -142,7 +142,7 @@
 
                             {{-- Product Name --}}
                             <a
-                                href=""
+                                href="{{ route('product.show', $product->slug) }}"
                                 class="block"
                             >
 
@@ -219,7 +219,7 @@
 
                             {{-- View Product --}}
                             <a
-                                href=""
+                                href="{{ route('product.show', $product->slug) }}"
                                 class="mt-4 w-full inline-flex items-center
                                 justify-center gap-2
                                 bg-gray-900 text-white
@@ -303,6 +303,7 @@
     @endif
 
 </div>
+
 
 </div>
 
