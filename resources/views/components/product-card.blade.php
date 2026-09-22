@@ -6,6 +6,9 @@
     $hasDiscount = $product->discount_price && $product->discount_price < $product->price;
 
     $discountPercent = $hasDiscount ? round((($product->price - $product->discount_price) / $product->price) * 100) : 0;
+    $avgRating = (float) ($product->avg_rating ?? 0);
+    $fullStars = (int) floor($avgRating);
+    $hasHalfStar = $avgRating - $fullStars >= 0.5 && $avgRating < 5;
 @endphp
 
 <div
@@ -80,9 +83,9 @@
             <div class="flex items-center text-sm text-yellow-400">
 
                 @for ($i = 1; $i <= 5; $i++)
-                    @if ($i <= floor($product->avg_rating))
+                    @if ($i <= $fullStars)
                         <i class="fa-solid fa-star"></i>
-                    @elseif($i - $product->avg_rating < 1)
+                    @elseif ($hasHalfStar && $i == $fullStars + 1)
                         <i class="fa-solid fa-star-half-stroke"></i>
                     @else
                         <i class="fa-regular fa-star text-gray-300"></i>
@@ -92,7 +95,7 @@
             </div>
 
             <span class="text-xs text-gray-500 dark:text-gray-400">
-                {{ number_format($product->avg_rating ?? 0, 1) }}
+                {{ number_format($avgRating, 1) }}
             </span>
 
         </div>

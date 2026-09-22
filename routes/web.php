@@ -8,6 +8,8 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReviewController;
+
 
 
 // Home
@@ -103,5 +105,14 @@ Route::middleware('auth')->group(function () {
     // Remove product from wishlist
     Route::delete('/wishlist/{product}', [WishlistController::class, 'destroy'])
         ->name('wishlist.destroy');
+
+});
+
+Route::middleware('auth')->group(function () {
+
+    Route::post(
+        '/product/{product}/review',
+        [ReviewController::class, 'store']
+    )->name('reviews.store');
 
 });

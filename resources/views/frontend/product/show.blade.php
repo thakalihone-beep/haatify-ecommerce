@@ -1,660 +1,548 @@
-{{-- resources/views/frontend/product/show.blade.php --}}
-
 @extends('layouts.app')
 
 @section('title', $product->name . ' | Haatify')
 
 @section('content')
 
-    @php
-        /*
-|--------------------------------------------------------------------------
-| Prepare product images
-|--------------------------------------------------------------------------
-*/
+@php
+    /*
+    |--------------------------------------------------------------------------
+    | Prepare Product Images
+    |--------------------------------------------------------------------------
+    */
 
-        $images = $product->images ?? [];
+    $images = $product->images ?? [];
 
-        if (is_string($images)) {
-            $decoded = json_decode($images, true);
-            $images = is_array($decoded) ? $decoded : [$images];
+    if (is_string($images)) {
+        $decoded = json_decode($images, true);
+        $images = is_array($decoded) ? $decoded : [$images];
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prepare Variation Attributes
+    |--------------------------------------------------------------------------
+    */
+
+    $variationAttributes = [];
+
+    foreach ($product->variations as $variation) {
+        $attributes = $variation->attributes ?? [];
+
+        if (is_string($attributes)) {
+            $decoded = json_decode($attributes, true);
+            $attributes = is_array($decoded) ? $decoded : [];
         }
 
-        /*
-|--------------------------------------------------------------------------
-| Prepare variation attributes
-|
-| Example:
-| [
-|     "size" => ["S", "M", "L"],
-|     "color" => ["Black", "White"]
-| ]
-|--------------------------------------------------------------------------
-*/
-
-        $variationAttributes = [];
-
-        foreach ($product->variations as $variation) {
-            $attributes = $variation->attributes ?? [];
-
-            if (is_string($attributes)) {
-                $decoded = json_decode($attributes, true);
-                $attributes = is_array($decoded) ? $decoded : [];
+        foreach ($attributes as $attributeName => $attributeValue) {
+            if (!isset($variationAttributes[$attributeName])) {
+                $variationAttributes[$attributeName] = [];
             }
 
-            foreach ($attributes as $attributeName => $attributeValue) {
-                if (!isset($variationAttributes[$attributeName])) {
-                    $variationAttributes[$attributeName] = [];
-                }
-
-                if (!in_array($attributeValue, $variationAttributes[$attributeName])) {
-                    $variationAttributes[$attributeName][] = $attributeValue;
-                }
+            if (!in_array($attributeValue, $variationAttributes[$attributeName])) {
+                $variationAttributes[$attributeName][] = $attributeValue;
             }
         }
+    }
 
-        /*
-|--------------------------------------------------------------------------
-| Product tags
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | Product Tags
+    |--------------------------------------------------------------------------
+    */
 
-        $tags = $product->tags ?? [];
+    $tags = $product->tags ?? [];
 
-        if (is_string($tags)) {
-            $decodedTags = json_decode($tags, true);
-            $tags = is_array($decodedTags) ? $decodedTags : [];
-        }
+    if (is_string($tags)) {
+        $decodedTags = json_decode($tags, true);
+        $tags = is_array($decodedTags) ? $decodedTags : [];
+    }
 
-    @endphp
+    $rating = (float) $product->avg_rating;
+    $discount = 0;
 
-    <div class="min-h-screen bg-gray-50 py-8">
+    if (
+        $product->discount_price &&
+        $product->price > 0 &&
+        $product->discount_price < $product->price
+    ) {
+        $discount = round(
+            (($product->price - $product->discount_price) / $product->price) * 100
+        );
+    }
+@endphp
 
+<div class="min-h-screen bg-gray-50 py-6 md:py-10">
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {{-- =========================================================
-         BREADCRUMB
-    ========================================================== --}}
+        {{-- Breadcrumb --}}
+        <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <a href="{{ route('home') }}" class="hover:text-orange-500 transition">
+                Home
+            </a>
 
-            <div class="mb-6 text-sm text-gray-500">
+            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
 
-                <a href="{{ route('home') }}" class="hover:text-orange-500">
-                    Home
+            @if ($product->category)
+                <a
+                    href="{{ route('categories.show', $product->category->slug) }}"
+                    class="hover:text-orange-500 transition"
+                >
+                    {{ $product->category->name }}
                 </a>
 
-                <span class="mx-2">/</span>
+                <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+            @endif
 
-                @if ($product->category)
-                    <a href="{{ route('categories.show', $product->category->slug) }}" class="hover:text-orange-500">
+            <span class="text-gray-800 truncate">
+                {{ $product->name }}
+            </span>
+        </div>
 
-                        {{ $product->category->name }}
+        {{-- Main Product Card --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
 
-                    </a>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 p-5 md:p-8 lg:p-10">
 
-                    <span class="mx-2">/</span>
-                @endif
+                {{-- =====================================================
+                     LEFT SIDE - IMAGES
+                ====================================================== --}}
+                <div>
 
-                <span class="text-gray-700">
-                    {{ $product->name }}
-                </span>
+                    {{-- Main Image --}}
+                    <div class="relative bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden aspect-square flex items-center justify-center">
 
-            </div>
+                        @if ($product->first_image_url)
+
+                            @if ($discount > 0)
+                                <div class="absolute top-4 left-4 z-10 bg-orange-500 text-white text-sm font-bold px-3 py-1.5 rounded-full">
+                                    -{{ $discount }}%
+                                </div>
+                            @endif
+
+                            <button
+                                type="button"
+                                class="absolute top-4 right-4 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center text-gray-500 hover:text-orange-500 hover:border-orange-400 transition"
+                            >
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+
+                            <img
+                                id="mainProductImage"
+                                src="{{ $product->first_image_url }}"
+                                alt="{{ $product->name }}"
+                                class="w-full h-full object-contain p-8 md:p-12 transition duration-300"
+                            >
+
+                        @else
+
+                            <div class="flex flex-col items-center justify-center text-gray-400">
+                                <i class="fa-solid fa-image text-6xl mb-4"></i>
+                                <span>No image available</span>
+                            </div>
+
+                        @endif
+
+                    </div>
+
+                    {{-- Thumbnail Images --}}
+                    @if (is_array($images) && count($images) > 0)
+
+                        <div class="flex gap-3 mt-4 overflow-x-auto pb-2">
+
+                            @foreach ($images as $index => $image)
+
+                                @php
+                                    $imagePath = (string) $image;
+
+                                    if (
+                                        !str_starts_with($imagePath, 'http://') &&
+                                        !str_starts_with($imagePath, 'https://')
+                                    ) {
+                                        $imagePath = ltrim($imagePath, '/');
+
+                                        if (str_starts_with($imagePath, 'storage/')) {
+                                            $imagePath = substr($imagePath, strlen('storage/'));
+                                        }
+
+                                        $imagePath = asset('storage/' . $imagePath);
+                                    }
+                                @endphp
+
+                                <button
+                                    type="button"
+                                    onclick="changeMainImage(@js($imagePath))"
+                                    class="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-orange-500 transition focus:border-orange-500"
+                                >
+                                    <img
+                                        src="{{ $imagePath }}"
+                                        alt="{{ $product->name }}"
+                                        class="w-full h-full object-contain p-2"
+                                    >
+                                </button>
+
+                            @endforeach
+
+                        </div>
+
+                    @endif
+
+                </div>
 
 
-            {{-- =========================================================
-         PRODUCT
-    ========================================================== --}}
+                {{-- =====================================================
+                     RIGHT SIDE - PRODUCT INFORMATION
+                ====================================================== --}}
+                <div>
 
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    {{-- Category --}}
+                    @if ($product->category)
+                        <a
+                            href="{{ route('categories.show', $product->category->slug) }}"
+                            class="inline-flex items-center text-sm font-semibold text-orange-600 hover:text-orange-700 transition"
+                        >
+                            {{ $product->category->name }}
+                        </a>
+                    @endif
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-10">
+                    {{-- Product Name --}}
+                    <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mt-2">
+                        {{ $product->name }}
+                    </h1>
+
+                    {{-- Rating --}}
+                    <div class="flex items-center gap-3 mt-4">
+
+                        <div class="flex items-center gap-1">
+
+                            @php
+                                $fullStars = floor($rating);
+                                $hasHalfStar = $rating - $fullStars >= 0.5;
+                            @endphp
+
+                            @for ($i = 1; $i <= 5; $i++)
+
+                                @if ($i <= $fullStars)
+                                    <i class="fa-solid fa-star text-yellow-400"></i>
+                                @elseif ($hasHalfStar && $i == $fullStars + 1)
+                                    <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
+                                @else
+                                    <i class="fa-regular fa-star text-gray-300"></i>
+                                @endif
+
+                            @endfor
+
+                        </div>
+
+                        <span class="font-semibold text-gray-700">
+                            {{ number_format($rating, 1) }}
+                        </span>
+
+                        <span class="text-gray-300">|</span>
+
+                        <span class="text-sm text-gray-500">
+                            {{ $product->reviews()->where('is_approved', true)->count() }} reviews
+                        </span>
+
+                    </div>
+
+                    <div class="border-t border-gray-200 my-6"></div>
 
 
-                    {{-- =================================================
-                 LEFT: PRODUCT IMAGES
-            ================================================== --}}
-
+                    {{-- Price --}}
                     <div>
 
-                        {{-- Main Image --}}
+                        <div class="flex items-center flex-wrap gap-3">
 
-                        <div
-                            class="border border-gray-200 rounded-xl overflow-hidden
-                            bg-white aspect-square flex items-center justify-center">
+                            <span
+                                id="productPrice"
+                                class="text-3xl md:text-4xl font-bold text-gray-900"
+                            >
+                                @if ($product->discount_price)
+                                    Rs. {{ number_format($product->discount_price, 2) }}
+                                @else
+                                    Rs. {{ number_format($product->price, 2) }}
+                                @endif
+                            </span>
 
-                            @if ($product->first_image_url)
-                                <img id="mainProductImage" src="{{ $product->first_image_url }}" alt="{{ $product->name }}"
-                                    class="w-full h-full object-contain p-6">
-                            @else
-                                <div
-                                    class="flex flex-col items-center justify-center
-                                    text-gray-400">
+                            <span
+                                id="originalProductPrice"
+                                class="text-lg text-gray-400 line-through {{ $product->discount_price ? '' : 'hidden' }}"
+                            >
+                                @if ($product->discount_price)
+                                    Rs. {{ number_format($product->price, 2) }}
+                                @endif
+                            </span>
 
-                                    <i class="fa-solid fa-image text-6xl mb-3"></i>
+                        </div>
 
-                                    <span>
-                                        No image available
-                                    </span>
+                        <div id="discountBadge">
 
-                                </div>
+                            @if ($discount > 0)
+                                <span class="inline-flex items-center mt-2 px-3 py-1 text-sm font-bold text-green-700 bg-green-100 rounded-full">
+                                    Save {{ $discount }}%
+                                </span>
                             @endif
 
                         </div>
 
-
-                        {{-- Thumbnail Images --}}
-
-                        @if (is_array($images) && count($images) > 0)
-
-                            <div class="flex gap-3 mt-4 overflow-x-auto pb-2">
-
-                                @foreach ($images as $image)
-                                    @php
-                                        $imagePath = (string) $image;
-
-                                        if (
-                                            !str_starts_with($imagePath, 'http://') &&
-                                            !str_starts_with($imagePath, 'https://')
-                                        ) {
-                                            $imagePath = ltrim($imagePath, '/');
-
-                                            if (str_starts_with($imagePath, 'storage/')) {
-                                                $imagePath = substr($imagePath, strlen('storage/'));
-                                            }
-
-                                            $imagePath = asset('storage/' . $imagePath);
-                                        }
-                                    @endphp
-
-                                    <button type="button" onclick="changeMainImage(@js($imagePath))"
-                                        class="flex-shrink-0 w-20 h-20 border-2
-                                       border-gray-200 rounded-lg overflow-hidden
-                                       hover:border-orange-500
-                                       focus:border-orange-500">
-
-                                        <img src="{{ $imagePath }}" alt="{{ $product->name }}"
-                                            class="w-full h-full object-contain p-1">
-
-                                    </button>
-                                @endforeach
-
-                            </div>
-
-                        @endif
-
                     </div>
 
 
-                    {{-- =================================================
-                 RIGHT: PRODUCT INFORMATION
-            ================================================== --}}
+                    {{-- Stock --}}
+                    <div class="mt-6">
 
-                    <div>
+                        <div id="stockInformation">
 
-                        {{-- Category --}}
+                            @if ($product->stock_qty > 0)
 
-                        @if ($product->category)
-                            <a href="{{ route('categories.show', $product->category->slug) }}"
-                                class="text-sm text-orange-600 font-medium hover:underline">
-                                {{ $product->category->name }}
-                            </a>
-                        @endif
-
-
-                        {{-- Product Name --}}
-
-                        <h1
-                            class="text-2xl md:text-3xl font-semibold
-                           text-gray-900 mt-2 leading-tight">
-
-                            {{ $product->name }}
-
-                        </h1>
-
-
-                        {{-- Rating --}}
-
-                        <div class="flex items-center gap-3 mt-4">
-
-                            <div class="flex items-center">
-
-                                @php
-                                    $rating = (float) $product->avg_rating;
-                                    $fullStars = floor($rating);
-                                    $hasHalfStar = $rating - $fullStars >= 0.5;
-                                @endphp
-
-                                @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= $fullStars)
-                                        <i class="fa-solid fa-star text-yellow-400"></i>
-                                    @elseif($hasHalfStar && $i == $fullStars + 1)
-                                        <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
-                                    @else
-                                        <i class="fa-regular fa-star text-gray-300"></i>
-                                    @endif
-                                @endfor
-
-                            </div>
-
-                            <span class="text-sm text-gray-600">
-                                {{ number_format($rating, 1) }}
-                            </span>
-
-                        </div>
-
-
-                        <div class="border-t border-gray-200 my-6"></div>
-
-
-                        {{-- =================================================
-                     VARIATIONS
-                ================================================== --}}
-
-                        @if ($product->variations->count() > 0)
-
-                            <div class="space-y-5 mb-6">
-
-                                @foreach ($variationAttributes as $attributeName => $attributeValues)
-                                    <div>
-
-                                        <div class="flex items-center justify-between mb-2">
-
-                                            <label class="font-semibold text-gray-800 capitalize">
-
-                                                {{ str_replace('_', ' ', $attributeName) }}:
-
-                                                <span id="selected-{{ $attributeName }}" class="font-normal text-gray-500">
-                                                </span>
-
-                                            </label>
-
-                                        </div>
-
-
-                                        <div class="flex flex-wrap gap-2">
-
-                                            @foreach ($attributeValues as $attributeValue)
-                                                <button type="button"
-                                                    class="variation-option border border-gray-300
-                                                   rounded-lg px-4 py-2 text-sm
-                                                   hover:border-orange-500
-                                                   hover:text-orange-500
-                                                   transition"
-                                                    data-attribute="{{ $attributeName }}"
-                                                    data-value="{{ $attributeValue }}"
-                                                    onclick="selectVariationOption(
-                                                '{{ $attributeName }}',
-                                                @js($attributeValue),
-                                                this
-                                            )">
-                                                    {{ $attributeValue }}
-                                                </button>
-                                            @endforeach
-
-                                        </div>
-
-                                    </div>
-                                @endforeach
-
-                            </div>
-
-
-                            {{-- Selected Variation ID --}}
-
-                            <input type="hidden" id="selectedVariationId" value="">
-
-                        @endif
-
-
-                        {{-- =================================================
-                     PRICE
-                ================================================== --}}
-
-                        <div>
-
-                            <span id="productPrice" class="text-3xl font-bold text-gray-900">
-                                @if ($product->discount_price)
-                                    $. {{ number_format($product->discount_price, 2) }}
-                                @else
-                                    $. {{ number_format($product->price, 2) }}
-                                @endif
-                            </span>
-
-
-                            <span id="originalProductPrice"
-                                class="text-lg text-gray-400 line-through ml-3
-                        {{ $product->discount_price ? '' : 'hidden' }}">
-                                @if ($product->discount_price)
-                                    $. {{ number_format($product->price, 2) }}
-                                @endif
-                            </span>
-
-
-                            <div id="discountBadge">
-
-                                @if ($product->discount_price && $product->price > 0 && $product->discount_price < $product->price)
-
-                                    @php
-                                        $discount =
-                                            (($product->price - $product->discount_price) / $product->price) * 100;
-                                    @endphp
-
-                                    <span
-                                        class="inline-block mt-2 px-2 py-1
-                                         text-sm font-semibold
-                                         text-green-700 bg-green-100
-                                         rounded">
-
-                                        {{ round($discount) }}% off
-
+                                <div class="flex items-center gap-2 text-green-600">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span class="font-semibold">
+                                        In Stock
                                     </span>
-
-                                @endif
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- =================================================
-                     STOCK
-                ================================================== --}}
-
-                        <div class="mt-5">
-
-                            <div id="stockInformation">
-
-                                @if ($product->stock_qty > 0)
-                                    <div class="flex items-center gap-2 text-green-600">
-
-                                        <i class="fa-solid fa-circle-check"></i>
-
-                                        <span class="font-medium">
-                                            In Stock
-                                        </span>
-
-                                    </div>
-
-                                    <p class="text-sm text-gray-500 mt-1">
-                                        {{ $product->stock_qty }} items available
-                                    </p>
-                                @else
-                                    <div class="flex items-center gap-2 text-red-600">
-
-                                        <i class="fa-solid fa-circle-xmark"></i>
-
-                                        <span class="font-medium">
-                                            Out of Stock
-                                        </span>
-
-                                    </div>
-                                @endif
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- =================================================
-                     DESCRIPTION
-                ================================================== --}}
-
-                        @if ($product->description)
-                            <div class="mt-6">
-
-                                <h2 class="text-lg font-semibold text-gray-900 mb-2">
-                                    About this product
-                                </h2>
-
-                                <div class="text-gray-600 leading-relaxed">
-
-                                    {!! $product->description !!}
-
                                 </div>
 
-                            </div>
-                        @endif
+                                <p class="text-sm text-gray-500 mt-1">
+                                    {{ $product->stock_qty }} items available
+                                </p>
 
+                            @else
 
-                        {{-- =================================================
-                     TAGS
-                ================================================== --}}
-
-                        @if (is_array($tags) && count($tags) > 0)
-
-                            <div class="mt-5">
-
-                                <div class="flex flex-wrap gap-2">
-
-                                    @foreach ($tags as $tag)
-                                        <span
-                                            class="px-3 py-1 bg-gray-100
-                                             text-gray-600 text-sm
-                                             rounded-full">
-
-                                            #{{ $tag }}
-
-                                        </span>
-                                    @endforeach
-
+                                <div class="flex items-center gap-2 text-red-600">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                    <span class="font-semibold">
+                                        Out of Stock
+                                    </span>
                                 </div>
 
-                            </div>
-
-                        @endif
-
-
-                        <div class="border-t border-gray-200 my-6"></div>
-
-
-                        {{-- =================================================
-                     QUANTITY
-                ================================================== --}}
-
-                        <div id="purchaseSection">
-
-                            <div class="flex items-center gap-4 mb-5">
-
-                                <span class="font-medium text-gray-800">
-                                    Quantity:
-                                </span>
-
-                                <div
-                                    class="flex items-center border border-gray-300
-                                    rounded-lg overflow-hidden">
-
-                                    <button type="button" onclick="decreaseQuantity()" class="w-10 h-10 hover:bg-gray-100">
-                                        −
-                                    </button>
-
-                                    <input id="quantity" type="number" value="1" min="1"
-                                        max="{{ $product->stock_qty }}"
-                                        class="w-14 h-10 text-center border-x
-                                       border-gray-300 focus:outline-none">
-
-                                    <button type="button" onclick="increaseQuantity()" class="w-10 h-10 hover:bg-gray-100">
-                                        +
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Buttons --}}
-
-                            <div class="flex flex-col sm:flex-row gap-3">
-
-                                <button id="addToCartButton" type="button"
-                                    class="flex-1 bg-yellow-400
-                                   hover:bg-yellow-500
-                                   text-gray-900 font-semibold
-                                   py-3 px-6 rounded-lg
-                                   transition">
-
-                                    <i class="fa-solid fa-cart-plus mr-2"></i>
-
-                                    Add to Cart
-
-                                </button>
-
-
-                                <button id="buyNowButton" type="button"
-                                    class="flex-1 bg-orange-500
-                                   hover:bg-orange-600
-                                   text-white font-semibold
-                                   py-3 px-6 rounded-lg
-                                   transition">
-
-                                    Buy Now
-
-                                </button>
-
-                            </div>
-
-
-                            {{-- Wishlist --}}
-
-                            <form action="{{ route('wishlist.store', $product->id) }}" method="POST">
-                                @csrf
-
-                                <button type="submit"
-                                    class="w-full mt-3 border border-gray-300
-                               hover:border-red-400
-                               hover:text-red-500
-                               text-gray-700 font-medium
-                               py-3 rounded-lg transition">
-
-                                    <i class="fa-regular fa-heart mr-2"></i>
-
-                                    Add to Wishlist
-
-                                </button>
-                            </form>
-
-                        </div>
-
-
-                        {{-- =================================================
-                     DELIVERY INFORMATION
-                ================================================== --}}
-
-                        <div class="mt-6 bg-gray-50 rounded-lg p-4">
-
-                            <div class="flex items-start gap-3 mb-4">
-
-                                <i class="fa-solid fa-truck text-orange-500 mt-1"></i>
-
-                                <div>
-
-                                    <p class="font-medium text-gray-800">
-                                        Delivery
-                                    </p>
-
-                                    <p class="text-sm text-gray-500">
-                                        Delivery available across Nepal
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="flex items-start gap-3">
-
-                                <i class="fa-solid fa-shield-halved text-green-600 mt-1"></i>
-
-                                <div>
-
-                                    <p class="font-medium text-gray-800">
-                                        Secure Shopping
-                                    </p>
-
-                                    <p class="text-sm text-gray-500">
-                                        Safe and secure checkout
-                                    </p>
-
-                                </div>
-
-                            </div>
+                            @endif
 
                         </div>
 
                     </div>
 
-                </div>
 
-            </div>
+                    {{-- Variations --}}
+                    @if ($product->variations->count() > 0)
 
+                        <div class="space-y-5 mt-7 mb-6">
 
-            {{-- =========================================================
-         PRODUCT DETAILS
-    ========================================================== --}}
+                            @foreach ($variationAttributes as $attributeName => $attributeValues)
 
-            <div class="bg-white rounded-xl shadow-sm mt-8 p-6 lg:p-10">
+                                <div>
 
-                <h2 class="text-2xl font-semibold text-gray-900 mb-6">
-                    Product Details
-                </h2>
+                                    <div class="flex items-center justify-between mb-3">
 
+                                        <label class="font-semibold text-gray-900 capitalize">
+                                            {{ str_replace('_', ' ', $attributeName) }}:
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <span
+                                                id="selected-{{ $attributeName }}"
+                                                class="font-normal text-orange-600"
+                                            ></span>
+                                        </label>
 
-                    <div class="flex justify-between border-b py-3">
+                                    </div>
 
-                        <span class="text-gray-500">
-                            Product
-                        </span>
+                                    <div class="flex flex-wrap gap-2">
 
-                        <span class="font-medium text-gray-800">
-                            {{ $product->name }}
-                        </span>
+                                        @foreach ($attributeValues as $attributeValue)
 
-                    </div>
+                                            <button
+                                                type="button"
+                                                class="variation-option border border-gray-300 bg-white rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 transition"
+                                                data-attribute="{{ $attributeName }}"
+                                                data-value="{{ $attributeValue }}"
+                                                onclick="selectVariationOption('{{ $attributeName }}', @js($attributeValue), this)"
+                                            >
+                                                {{ $attributeValue }}
+                                            </button>
 
+                                        @endforeach
 
-                    @if ($product->category)
-                        <div class="flex justify-between border-b py-3">
+                                    </div>
 
-                            <span class="text-gray-500">
-                                Category
-                            </span>
+                                </div>
 
-                            <span class="font-medium text-gray-800">
-                                {{ $product->category->name }}
-                            </span>
+                            @endforeach
 
                         </div>
+
+                        <input
+                            type="hidden"
+                            id="selectedVariationId"
+                            value=""
+                        >
+
                     @endif
 
 
-                    <div class="flex justify-between border-b py-3">
+                    {{-- Description --}}
+                    @if ($product->description)
 
-                        <span class="text-gray-500">
-                            Availability
-                        </span>
+                        <div class="mt-6">
 
-                        <span id="detailAvailability"
-                            class="font-medium
-                    {{ $product->stock_qty > 0 ? 'text-green-600' : 'text-red-600' }}">
+                            <h2 class="text-lg font-bold text-gray-900 mb-2">
+                                About this product
+                            </h2>
 
-                            {{ $product->stock_qty > 0 ? 'In Stock' : 'Out of Stock' }}
+                            <div class="text-gray-600 leading-relaxed text-sm md:text-base">
+                                {!! $product->description !!}
+                            </div>
 
-                        </span>
+                        </div>
+
+                    @endif
+
+
+                    {{-- Tags --}}
+                    @if (is_array($tags) && count($tags) > 0)
+
+                        <div class="flex flex-wrap gap-2 mt-5">
+
+                            @foreach ($tags as $tag)
+
+                                <span class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                                    #{{ $tag }}
+                                </span>
+
+                            @endforeach
+
+                        </div>
+
+                    @endif
+
+
+                    <div class="border-t border-gray-200 my-7"></div>
+
+
+                    {{-- Purchase Section --}}
+                    <div id="purchaseSection">
+
+                        {{-- Quantity --}}
+                        <div class="flex items-center justify-between mb-5">
+
+                            <span class="font-semibold text-gray-800">
+                                Quantity
+                            </span>
+
+                            <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden">
+
+                                <button
+                                    type="button"
+                                    onclick="decreaseQuantity()"
+                                    class="w-11 h-11 bg-gray-50 hover:bg-gray-100 text-lg transition"
+                                >
+                                    −
+                                </button>
+
+                                <input
+                                    id="quantity"
+                                    type="number"
+                                    value="1"
+                                    min="1"
+                                    max="{{ $product->stock_qty }}"
+                                    class="w-14 h-11 text-center font-semibold border-x border-gray-300 focus:outline-none"
+                                >
+
+                                <button
+                                    type="button"
+                                    onclick="increaseQuantity()"
+                                    class="w-11 h-11 bg-gray-50 hover:bg-gray-100 text-lg transition"
+                                >
+                                    +
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- Buttons --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                            <button
+                                id="addToCartButton"
+                                type="button"
+                                class="flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3.5 px-6 rounded-xl transition shadow-sm"
+                            >
+                                <i class="fa-solid fa-cart-plus"></i>
+                                Add to Cart
+                            </button>
+
+                            <button
+                                id="buyNowButton"
+                                type="button"
+                                class="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-sm"
+                            >
+                                <i class="fa-solid fa-bolt"></i>
+                                Buy Now
+                            </button>
+
+                        </div>
+
+
+                        {{-- Wishlist --}}
+                        <form
+                            action="{{ route('wishlist.store', $product->id) }}"
+                            method="POST"
+                            class="mt-3"
+                        >
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="w-full flex items-center justify-center gap-2 border-2 border-gray-200 hover:border-red-400 hover:text-red-500 text-gray-700 font-semibold py-3 rounded-xl transition"
+                            >
+                                <i class="fa-regular fa-heart"></i>
+                                Add to Wishlist
+                            </button>
+
+                        </form>
 
                     </div>
 
 
-                    <div class="flex justify-between border-b py-3">
+                    {{-- Delivery Information --}}
+                    <div class="mt-7 rounded-2xl border border-gray-200 bg-gray-50 overflow-hidden">
 
-                        <span class="text-gray-500">
-                            Rating
-                        </span>
+                        <div class="flex items-start gap-4 p-4 border-b border-gray-200">
 
-                        <span class="font-medium text-gray-800">
-                            {{ number_format((float) $product->avg_rating, 1) }} / 5
-                        </span>
+                            <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-truck text-orange-500"></i>
+                            </div>
+
+                            <div>
+                                <p class="font-semibold text-gray-900">
+                                    Delivery
+                                </p>
+
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Delivery available across Nepal
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4">
+
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-shield-halved text-green-600"></i>
+                            </div>
+
+                            <div>
+                                <p class="font-semibold text-gray-900">
+                                    Secure Shopping
+                                </p>
+
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Safe and secure checkout
+                                </p>
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -665,197 +553,398 @@
         </div>
 
 
+        {{-- =============================================================
+             PRODUCT DETAILS
+        ============================================================= --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm mt-8 p-6 md:p-8 lg:p-10">
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                Product Details
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10">
+
+                <div class="flex justify-between gap-4 border-b border-gray-100 py-4">
+                    <span class="text-gray-500">
+                        Product
+                    </span>
+
+                    <span class="font-semibold text-gray-800 text-right">
+                        {{ $product->name }}
+                    </span>
+                </div>
+
+                @if ($product->category)
+
+                    <div class="flex justify-between gap-4 border-b border-gray-100 py-4">
+                        <span class="text-gray-500">
+                            Category
+                        </span>
+
+                        <span class="font-semibold text-gray-800 text-right">
+                            {{ $product->category->name }}
+                        </span>
+                    </div>
+
+                @endif
+
+                <div class="flex justify-between gap-4 border-b border-gray-100 py-4">
+
+                    <span class="text-gray-500">
+                        Availability
+                    </span>
+
+                    <span
+                        id="detailAvailability"
+                        class="font-semibold {{ $product->stock_qty > 0 ? 'text-green-600' : 'text-red-600' }}"
+                    >
+                        {{ $product->stock_qty > 0 ? 'In Stock' : 'Out of Stock' }}
+                    </span>
+
+                </div>
+
+                <div class="flex justify-between gap-4 border-b border-gray-100 py-4">
+
+                    <span class="text-gray-500">
+                        Rating
+                    </span>
+
+                    <span class="font-semibold text-gray-800">
+                        {{ number_format($rating, 1) }} / 5
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- =============================================================
+             REVIEWS
+        ============================================================= --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm mt-8 p-6 md:p-8 lg:p-10">
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                <div>
+
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        Customer Reviews
+                    </h2>
+
+                    <div class="flex items-center gap-2 mt-2">
+
+                        <div class="flex">
+
+                            @for ($i = 1; $i <= 5; $i++)
+
+                                <i
+                                    class="fa-solid fa-star {{ $i <= round($product->avg_rating) ? 'text-yellow-400' : 'text-gray-300' }}"
+                                ></i>
+
+                            @endfor
+
+                        </div>
+
+                        <span class="font-semibold text-gray-700">
+                            {{ number_format($product->avg_rating, 1) }}
+                        </span>
+
+                        <span class="text-sm text-gray-400">
+                            ({{ $product->reviews()->where('is_approved', true)->count() }} reviews)
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- Review Form --}}
+            <form
+                action="{{ route('reviews.store', $product) }}"
+                method="POST"
+                class="mt-8 border-t border-gray-200 pt-8"
+            >
+                @csrf
+
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    Rate this product
+                </h3>
+
+                <div class="flex gap-2">
+
+                    @for ($i = 1; $i <= 5; $i++)
+
+                        <label class="cursor-pointer">
+
+                            <input
+                                type="radio"
+                                name="rating"
+                                value="{{ $i }}"
+                                class="hidden peer"
+                                required
+                            >
+
+                            <i class="fa-solid fa-star text-2xl text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition"></i>
+
+                        </label>
+
+                    @endfor
+
+                </div>
+
+                <textarea
+                    name="comment"
+                    rows="4"
+                    placeholder="Write your review..."
+                    class="w-full mt-5 border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none resize-none"
+                ></textarea>
+
+                <button
+                    type="submit"
+                    class="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold px-7 py-3 rounded-xl transition"
+                >
+                    Submit Review
+                </button>
+
+            </form>
+
+        </div>
+
     </div>
 
-    {{-- =========================================================
-VARIATION DATA FOR JAVASCRIPT
-========================================================= --}}
+</div>
 
-    <script>
-        const productVariations = @json($product->variations);
 
-        let selectedAttributes = {};
+{{-- =============================================================
+     JAVASCRIPT
+============================================================= --}}
+<script>
 
-        function changeMainImage(imageUrl) {
-            const mainImage = document.getElementById('mainProductImage');
+    const productVariations = @json($product->variations);
 
-            if (mainImage && imageUrl) {
-                mainImage.src = imageUrl;
-            }
+    let selectedAttributes = {};
+
+
+    function changeMainImage(imageUrl) {
+
+        const mainImage = document.getElementById('mainProductImage');
+
+        if (mainImage && imageUrl) {
+            mainImage.src = imageUrl;
         }
 
-        function selectVariationOption(attributeName, attributeValue, button) {
-            selectedAttributes[attributeName] = attributeValue;
+    }
 
-            document
-                .querySelectorAll(
-                    `.variation-option[data-attribute="${attributeName}"]`
-                )
-                .forEach(option => {
 
-                    option.classList.remove(
-                        'border-orange-500',
-                        'bg-orange-50',
-                        'text-orange-600'
-                    );
+    function selectVariationOption(attributeName, attributeValue, button) {
 
-                    option.classList.add('border-gray-300');
-                });
+        selectedAttributes[attributeName] = attributeValue;
 
-            button.classList.remove('border-gray-300');
 
-            button.classList.add(
-                'border-orange-500',
-                'bg-orange-50',
-                'text-orange-600'
-            );
+        document
+            .querySelectorAll(
+                `.variation-option[data-attribute="${attributeName}"]`
+            )
+            .forEach(option => {
 
-            const selectedText = document.getElementById(
-                `selected-${attributeName}`
-            );
-
-            if (selectedText) {
-                selectedText.textContent = attributeValue;
-            }
-
-            findMatchingVariation();
-        }
-
-        function findMatchingVariation() {
-            const variation = productVariations.find(variation => {
-
-                if (!variation.is_active) {
-                    return false;
-                }
-
-                let attributes = variation.attributes;
-
-                if (typeof attributes === 'string') {
-                    try {
-                        attributes = JSON.parse(attributes);
-                    } catch (error) {
-                        attributes = {};
-                    }
-                }
-
-                return Object.entries(selectedAttributes).every(
-                    ([attributeName, attributeValue]) => {
-                        return attributes[attributeName] == attributeValue;
-                    }
+                option.classList.remove(
+                    'border-orange-500',
+                    'bg-orange-50',
+                    'text-orange-600'
                 );
+
+                option.classList.add('border-gray-300');
+
             });
 
-            if (!variation) {
-                return;
-            }
 
-            document.getElementById('selectedVariationId').value =
-                variation.id;
+        button.classList.remove('border-gray-300');
 
-            updatePrice(variation);
+        button.classList.add(
+            'border-orange-500',
+            'bg-orange-50',
+            'text-orange-600'
+        );
 
-            updateStock(variation);
 
-            if (variation.image) {
+        const selectedText = document.getElementById(
+            `selected-${attributeName}`
+        );
 
-                let imageUrl = variation.image;
-
-                if (
-                    !imageUrl.startsWith('http://') &&
-                    !imageUrl.startsWith('https://')
-                ) {
-
-                    imageUrl = imageUrl.replace(/^\/+/, '');
-
-                    if (imageUrl.startsWith('storage/')) {
-                        imageUrl = imageUrl.substring(8);
-                    }
-
-                    imageUrl = "{{ asset('storage') }}/" + imageUrl;
-                }
-
-                changeMainImage(imageUrl);
-            }
+        if (selectedText) {
+            selectedText.textContent = attributeValue;
         }
 
-        function updatePrice(variation) {
-            const priceElement =
-                document.getElementById('productPrice');
 
-            const originalPriceElement =
-                document.getElementById('originalProductPrice');
+        findMatchingVariation();
 
-            const discountBadge =
-                document.getElementById('discountBadge');
+    }
 
-            const hasDiscount =
-                variation.discount_price !== null &&
-                Number(variation.discount_price) < Number(variation.price);
 
-            const finalPrice =
-                hasDiscount ?
-                variation.discount_price :
-                variation.price;
+    function findMatchingVariation() {
 
-            priceElement.textContent =
-                '$. ' + Number(finalPrice).toFixed(2);
+        const variation = productVariations.find(variation => {
 
-            if (hasDiscount) {
+            if (!variation.is_active) {
+                return false;
+            }
 
-                originalPriceElement.textContent =
-                    '$. ' + Number(variation.price).toFixed(2);
 
-                originalPriceElement.classList.remove('hidden');
+            let attributes = variation.attributes;
 
-                const discount =
-                    (
-                        (Number(variation.price) -
-                            Number(variation.discount_price)) /
-                        Number(variation.price)
-                    ) * 100;
 
-                discountBadge.innerHTML = `
-                <span class="inline-block mt-2 px-2 py-1
-                             text-sm font-semibold
-                             text-green-700 bg-green-100
-                             rounded">
-                    ${Math.round(discount)}% off
+            if (typeof attributes === 'string') {
+
+                try {
+                    attributes = JSON.parse(attributes);
+                } catch (error) {
+                    attributes = {};
+                }
+
+            }
+
+
+            return Object.entries(selectedAttributes).every(
+                ([attributeName, attributeValue]) => {
+                    return attributes[attributeName] == attributeValue;
+                }
+            );
+
+        });
+
+
+        if (!variation) {
+            return;
+        }
+
+
+        document.getElementById('selectedVariationId').value =
+            variation.id;
+
+
+        updatePrice(variation);
+
+        updateStock(variation);
+
+
+        if (variation.image) {
+
+            let imageUrl = variation.image;
+
+
+            if (
+                !imageUrl.startsWith('http://') &&
+                !imageUrl.startsWith('https://')
+            ) {
+
+                imageUrl = imageUrl.replace(/^\/+/, '');
+
+
+                if (imageUrl.startsWith('storage/')) {
+                    imageUrl = imageUrl.substring(8);
+                }
+
+
+                imageUrl = "{{ asset('storage') }}/" + imageUrl;
+
+            }
+
+
+            changeMainImage(imageUrl);
+
+        }
+
+    }
+
+
+    function updatePrice(variation) {
+
+        const priceElement =
+            document.getElementById('productPrice');
+
+        const originalPriceElement =
+            document.getElementById('originalProductPrice');
+
+        const discountBadge =
+            document.getElementById('discountBadge');
+
+
+        const hasDiscount =
+            variation.discount_price !== null &&
+            Number(variation.discount_price) < Number(variation.price);
+
+
+        const finalPrice =
+            hasDiscount
+                ? variation.discount_price
+                : variation.price;
+
+
+        priceElement.textContent =
+            'Rs. ' + Number(finalPrice).toFixed(2);
+
+
+        if (hasDiscount) {
+
+            originalPriceElement.textContent =
+                'Rs. ' + Number(variation.price).toFixed(2);
+
+            originalPriceElement.classList.remove('hidden');
+
+
+            const discount =
+                (
+                    (Number(variation.price) -
+                        Number(variation.discount_price)) /
+                    Number(variation.price)
+                ) * 100;
+
+
+            discountBadge.innerHTML = `
+                <span class="inline-flex items-center mt-2 px-3 py-1 text-sm font-bold text-green-700 bg-green-100 rounded-full">
+                    Save ${Math.round(discount)}%
                 </span>
             `;
 
-            } else {
+        } else {
 
-                originalPriceElement.classList.add('hidden');
+            originalPriceElement.classList.add('hidden');
 
-                discountBadge.innerHTML = '';
-            }
+            discountBadge.innerHTML = '';
+
         }
 
-        function updateStock(variation) {
-            const stockInformation =
-                document.getElementById('stockInformation');
+    }
 
-            const quantity =
-                document.getElementById('quantity');
 
-            const purchaseSection =
-                document.getElementById('purchaseSection');
+    function updateStock(variation) {
 
-            const detailAvailability =
-                document.getElementById('detailAvailability');
+        const stockInformation =
+            document.getElementById('stockInformation');
 
-            if (variation.stock_qty > 0) {
+        const quantity =
+            document.getElementById('quantity');
 
-                stockInformation.innerHTML = `
+        const purchaseSection =
+            document.getElementById('purchaseSection');
 
+        const detailAvailability =
+            document.getElementById('detailAvailability');
+
+
+        if (variation.stock_qty > 0) {
+
+            stockInformation.innerHTML = `
                 <div class="flex items-center gap-2 text-green-600">
-
                     <i class="fa-solid fa-circle-check"></i>
 
-                    <span class="font-medium">
+                    <span class="font-semibold">
                         In Stock
                     </span>
-
                 </div>
 
                 <p class="text-sm text-gray-500 mt-1">
@@ -863,83 +952,100 @@ VARIATION DATA FOR JAVASCRIPT
                 </p>
             `;
 
-                quantity.max = variation.stock_qty;
 
-                purchaseSection.classList.remove('hidden');
+            quantity.max = variation.stock_qty;
 
-                detailAvailability.textContent = 'In Stock';
+            purchaseSection.classList.remove('hidden');
 
-                detailAvailability.classList.remove(
-                    'text-red-600'
-                );
 
-                detailAvailability.classList.add(
-                    'text-green-600'
-                );
+            detailAvailability.textContent = 'In Stock';
 
-            } else {
+            detailAvailability.classList.remove(
+                'text-red-600'
+            );
 
-                stockInformation.innerHTML = `
+            detailAvailability.classList.add(
+                'text-green-600'
+            );
 
+        } else {
+
+            stockInformation.innerHTML = `
                 <div class="flex items-center gap-2 text-red-600">
-
                     <i class="fa-solid fa-circle-xmark"></i>
 
-                    <span class="font-medium">
+                    <span class="font-semibold">
                         Out of Stock
                     </span>
-
                 </div>
             `;
 
-                purchaseSection.classList.add('hidden');
 
-                detailAvailability.textContent = 'Out of Stock';
+            purchaseSection.classList.add('hidden');
 
-                detailAvailability.classList.remove(
-                    'text-green-600'
-                );
 
-                detailAvailability.classList.add(
-                    'text-red-600'
-                );
-            }
+            detailAvailability.textContent = 'Out of Stock';
+
+            detailAvailability.classList.remove(
+                'text-green-600'
+            );
+
+            detailAvailability.classList.add(
+                'text-red-600'
+            );
+
         }
 
-        function increaseQuantity() {
-            const quantity =
-                document.getElementById('quantity');
+    }
 
-            if (!quantity) {
-                return;
-            }
 
-            const max =
-                parseInt(quantity.max);
+    function increaseQuantity() {
 
-            const current =
-                parseInt(quantity.value) || 1;
+        const quantity =
+            document.getElementById('quantity');
 
-            if (current < max) {
-                quantity.value = current + 1;
-            }
+
+        if (!quantity) {
+            return;
         }
 
-        function decreaseQuantity() {
-            const quantity =
-                document.getElementById('quantity');
 
-            if (!quantity) {
-                return;
-            }
+        const max =
+            parseInt(quantity.max);
 
-            const current =
-                parseInt(quantity.value) || 1;
+        const current =
+            parseInt(quantity.value) || 1;
 
-            if (current > 1) {
-                quantity.value = current - 1;
-            }
+
+        if (current < max) {
+            quantity.value = current + 1;
         }
-    </script>
+
+    }
+
+
+    function decreaseQuantity() {
+
+        const quantity =
+            document.getElementById('quantity');
+
+
+        if (!quantity) {
+            return;
+        }
+
+
+        const current =
+            parseInt(quantity.value) || 1;
+
+
+        if (current > 1) {
+            quantity.value = current - 1;
+        }
+
+    }
+
+</script>
 
 @endsection
+

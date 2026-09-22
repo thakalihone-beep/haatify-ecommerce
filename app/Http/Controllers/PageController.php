@@ -31,4 +31,5 @@ class PageController extends Controller
 
         return view('frontend.product.show', compact('product'));
     }
+    
 }
