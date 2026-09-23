@@ -28,7 +28,7 @@
 
 
     <!-- Best Sellers -->
-    <a href="#" class="text-white hover:text-blue-500  flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
+    <a href="{{ route('best-sellers') }}" class="text-white hover:text-blue-500  flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         Best Sellers
 

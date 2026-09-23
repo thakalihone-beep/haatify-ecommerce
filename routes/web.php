@@ -119,3 +119,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/todays-deals', [PageController::class, 'todaysDeals'])
     ->name('todays-deals');
+
+
+Route::get('/best-sellers', [PageController::class, 'bestSellers'])
+    ->name('best-sellers');

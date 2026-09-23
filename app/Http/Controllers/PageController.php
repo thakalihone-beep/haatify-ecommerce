@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 
+
+
 class PageController extends Controller
 {
     public function index()
@@ -49,5 +51,34 @@ class PageController extends Controller
             ->paginate(24);
 
         return view('frontend.deals.index', compact('products'));
+    }
+
+    public function bestSellers()
+    {
+        $products = Product::query()
+            ->select('products.*')
+            ->selectSub(function ($query) {
+                $query->from('order_items')
+                    ->join(
+                        'orders',
+                        'orders.id',
+                        '=',
+                        'order_items.order_id'
+                    )
+                    ->selectRaw('COALESCE(SUM(order_items.quantity), 0)')
+                    ->whereColumn(
+                        'order_items.product_id',
+                        'products.id'
+                    )
+                    ->where('orders.status', 'delivered');
+            }, 'total_sold')
+            ->where('products.status', 'active')
+            ->orderByDesc('total_sold')
+            ->paginate(24);
+
+        return view(
+            'frontend.best-sellers.index',
+            compact('products')
+        );
     }
 }
