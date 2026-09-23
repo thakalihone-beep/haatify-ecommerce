@@ -21,6 +21,8 @@ class Product extends Model
         'stock_qty',
         'status',
         'avg_rating',
+        'deal_start_at',
+        'deal_end_at',
     ];
 
     protected function casts(): array
@@ -32,6 +34,8 @@ class Product extends Model
             'discount_price' => 'decimal:2',
             'stock_qty' => 'integer',
             'avg_rating' => 'decimal:2',
+            'deal_start_at' => 'datetime',
+            'deal_end_at' => 'datetime',
         ];
     }
 

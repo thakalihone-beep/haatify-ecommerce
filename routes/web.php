@@ -116,3 +116,6 @@ Route::middleware('auth')->group(function () {
     )->name('reviews.store');
 
 });
+
+Route::get('/todays-deals', [PageController::class, 'todaysDeals'])
+    ->name('todays-deals');

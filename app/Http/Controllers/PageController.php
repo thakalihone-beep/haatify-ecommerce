@@ -31,5 +31,23 @@ class PageController extends Controller
 
         return view('frontend.product.show', compact('product'));
     }
-    
+    public function todaysDeals()
+    {
+        $products = Product::with('category')
+            ->where('status', 'active')
+            ->where('discount_price', '>', 0)
+            ->whereColumn('discount_price', '<', 'price')
+            ->where(function ($query) {
+                $query->whereNull('deal_start_at')
+                    ->orWhere('deal_start_at', '<=', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('deal_end_at')
+                    ->orWhere('deal_end_at', '>=', now());
+            })
+            ->latest()
+            ->paginate(24);
+
+        return view('frontend.deals.index', compact('products'));
+    }
 }
