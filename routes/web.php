@@ -123,3 +123,7 @@ Route::get('/todays-deals', [PageController::class, 'todaysDeals'])
 
 Route::get('/best-sellers', [PageController::class, 'bestSellers'])
     ->name('best-sellers');
+
+
+Route::get('/new-arrivals', [PageController::class, 'newArrivals'])
+    ->name('new-arrivals');

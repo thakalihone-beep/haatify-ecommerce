@@ -81,4 +81,17 @@ class PageController extends Controller
             compact('products')
         );
     }
+    public function newArrivals()
+    {
+        $products = Product::query()
+            ->with('category')
+            ->where('status', 'active')
+            ->latest('created_at')
+            ->paginate(24);
+
+        return view(
+            'frontend.new-arrivals.index',
+            compact('products')
+        );
+    }
 }

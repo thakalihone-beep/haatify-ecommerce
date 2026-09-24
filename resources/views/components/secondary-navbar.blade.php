@@ -36,7 +36,7 @@
 
 
     <!-- New Arrivals -->
-    <a href="#" class="text-white hover:text-blue-500  flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
+    <a href="{{ route('new-arrivals') }}" class="text-white hover:text-blue-500  flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         New Arrivals
 
