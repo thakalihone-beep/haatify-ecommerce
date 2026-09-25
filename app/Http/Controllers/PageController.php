@@ -94,4 +94,19 @@ class PageController extends Controller
             compact('products')
         );
     }
+    public function todaysOffers()
+    {
+        $products = Product::query()
+            ->with('category')
+            ->where('status', 'active')
+            ->whereNotNull('discount_price')
+            ->whereColumn('discount_price', '<', 'price')
+            ->orderByDesc('created_at')
+            ->paginate(24);
+
+        return view(
+            'frontend.todays-offers.index',
+            compact('products')
+        );
+    }
 }

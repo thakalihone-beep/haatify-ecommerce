@@ -44,7 +44,7 @@
 
 
     <!-- Today's Offers -->
-    <a href="#"
+    <a href="{{ route('todays-offers') }}"
         class="text-white hover:text-blue-500 hidden md:flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         Today's Offers
