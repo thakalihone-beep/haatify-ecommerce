@@ -53,7 +53,7 @@
 
 
     <!-- Customer Service -->
-    <a href="#"
+    <a href="{{ route('customer-service') }}"
         class="text-white hover:text-blue-500 hidden lg:flex items-center h-9 px-2 border border-transparent hover:border-white rounded-sm">
 
         Customer Service

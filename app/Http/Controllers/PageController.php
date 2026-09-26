@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
-
-
+use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
@@ -108,5 +107,45 @@ class PageController extends Controller
             'frontend.todays-offers.index',
             compact('products')
         );
+    }
+    public function search(Request $request)
+    {
+        $query = trim((string) $request->query('q', ''));
+
+        $products = Product::query()
+            ->with('category')
+            ->where('status', 'active')
+            ->when($query !== '', function ($q) use ($query) {
+                $searchTerm = '%' . str_replace(['%', '_'], ['\\%', '\\_'], $query) . '%';
+
+                $q->where(function ($subQuery) use ($searchTerm, $query) {
+                    $subQuery->where('name', 'like', $searchTerm)
+                        ->orWhere('description', 'like', $searchTerm)
+                        ->orWhere('tags', 'like', '%' . str_replace(['%', '_'], ['\\%', '\\_'], json_encode($query)) . '%')
+                        ->orWhereHas('category', function ($categoryQuery) use ($query) {
+                            $categoryQuery->where('name', 'like', '%' . $query . '%');
+                        });
+                });
+            })
+            ->latest()
+            ->get();
+
+        return view('frontend.search.index', [
+            'products' => $products,
+            'query' => $query,
+        ]);
+    }
+
+    public function customerService()
+    {
+        return view('frontend.customer-service.index');
+    }
+    public function contactSupport()
+    {
+        return view('frontend.contact-support.index');
+    }
+    public function termsAndConditions()
+    {
+        return view('frontend.terms.index');
     }
 }

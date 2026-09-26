@@ -25,7 +25,7 @@ return new class extends Migration
 
             $table->foreignId('product_variation_id')
                 ->nullable()
-                ->constrained()
+                ->constrained('product_vaiations')
                 ->nullOnDelete();
 
             $table->unsignedInteger('quantity');

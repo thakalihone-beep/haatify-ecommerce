@@ -84,7 +84,13 @@
 
             <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
 
+            <a href="{{ route('categories.index') }}" class="hover:text-orange-500 transition">
+                All
+            </a>
+
             @if ($product->category)
+                <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+
                 <a
                     href="{{ route('categories.show', $product->category->slug) }}"
                     class="hover:text-orange-500 transition"
@@ -463,23 +469,36 @@
                         {{-- Buttons --}}
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                            <button
-                                id="addToCartButton"
-                                type="button"
-                                class="flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3.5 px-6 rounded-xl transition shadow-sm"
-                            >
-                                <i class="fa-solid fa-cart-plus"></i>
-                                Add to Cart
-                            </button>
+                            <form id="addToCartForm" action="{{ route('cart.add', $product) }}" method="POST" class="w-full">
+                                @csrf
+                                <input type="hidden" name="product_variation_id" id="selectedVariationId" value="">
+                                <input type="hidden" name="quantity" id="addToCartQuantity" value="1">
 
-                            <button
-                                id="buyNowButton"
-                                type="button"
-                                class="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-sm"
-                            >
-                                <i class="fa-solid fa-bolt"></i>
-                                Buy Now
-                            </button>
+                                <button
+                                    id="addToCartButton"
+                                    type="submit"
+                                    class="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3.5 px-6 rounded-xl transition shadow-sm"
+                                >
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                    Add to Cart
+                                </button>
+                            </form>
+
+                            <form id="buyNowForm" action="{{ route('cart.add', $product) }}" method="POST" class="w-full">
+                                @csrf
+                                <input type="hidden" name="product_variation_id" id="buyNowVariationId" value="">
+                                <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
+                                <input type="hidden" name="buy_now" value="1">
+
+                                <button
+                                    id="buyNowButton"
+                                    type="submit"
+                                    class="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-sm"
+                                >
+                                    <i class="fa-solid fa-bolt"></i>
+                                    Buy Now
+                                </button>
+                            </form>
 
                         </div>
 
@@ -729,6 +748,29 @@
     let selectedAttributes = {};
 
 
+    function syncQuantityInputs() {
+        const quantityInput = document.getElementById('quantity');
+        const quantityValue = quantityInput ? Number(quantityInput.value) || 1 : 1;
+
+        const cartQuantityInputs = [
+            document.getElementById('addToCartQuantity'),
+            document.getElementById('buyNowQuantity'),
+        ];
+
+        cartQuantityInputs.forEach((element) => {
+            if (element) {
+                element.value = quantityValue;
+            }
+        });
+
+        const variationId = document.getElementById('selectedVariationId')?.value || '';
+        const buyNowVariationId = document.getElementById('buyNowVariationId');
+
+        if (buyNowVariationId) {
+            buyNowVariationId.value = variationId;
+        }
+    }
+
     function changeMainImage(imageUrl) {
 
         const mainImage = document.getElementById('mainProductImage');
@@ -825,6 +867,11 @@
         document.getElementById('selectedVariationId').value =
             variation.id;
 
+        const buyNowVariationId = document.getElementById('buyNowVariationId');
+
+        if (buyNowVariationId) {
+            buyNowVariationId.value = variation.id;
+        }
 
         updatePrice(variation);
 
@@ -999,6 +1046,11 @@
     }
 
 
+    document.getElementById('quantity')?.addEventListener('input', syncQuantityInputs);
+
+    document.getElementById('addToCartForm')?.addEventListener('submit', syncQuantityInputs);
+    document.getElementById('buyNowForm')?.addEventListener('submit', syncQuantityInputs);
+
     function increaseQuantity() {
 
         const quantity =
@@ -1019,6 +1071,7 @@
 
         if (current < max) {
             quantity.value = current + 1;
+            syncQuantityInputs();
         }
 
     }
@@ -1041,6 +1094,7 @@
 
         if (current > 1) {
             quantity.value = current - 1;
+            syncQuantityInputs();
         }
 
     }

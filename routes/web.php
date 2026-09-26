@@ -9,8 +9,8 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReviewController;
-
-
+use App\Http\Controllers\CustomerSupportController;
+use App\Http\Controllers\OrderController;
 
 // Home
 Route::get('/', [PageController::class, 'index'])
@@ -28,6 +28,9 @@ Route::get('/categories', [CategoryController::class, 'index'])
 
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])
     ->name('categories.show');
+
+Route::get('/search', [PageController::class, 'search'])
+    ->name('search');
 
 
 // Authentication
@@ -89,7 +92,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
         ->name('checkout.success');
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -105,7 +107,6 @@ Route::middleware('auth')->group(function () {
     // Remove product from wishlist
     Route::delete('/wishlist/{product}', [WishlistController::class, 'destroy'])
         ->name('wishlist.destroy');
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -114,7 +115,6 @@ Route::middleware('auth')->group(function () {
         '/product/{product}/review',
         [ReviewController::class, 'store']
     )->name('reviews.store');
-
 });
 
 Route::get('/todays-deals', [PageController::class, 'todaysDeals'])
@@ -130,3 +130,27 @@ Route::get('/new-arrivals', [PageController::class, 'newArrivals'])
 
 Route::get('/todays-offers', [PageController::class, 'todaysOffers'])
     ->name('todays-offers');
+
+Route::get('/customer-service', [PageController::class, 'customerService'])
+    ->name('customer-service');
+
+Route::get('/contact-support', [PageController::class, 'contactSupport'])
+    ->name('contact-support');
+
+
+Route::post('/contact-support', [CustomerSupportController::class, 'store'])
+    ->name('contact-support.store');
+
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/orders', [OrderController::class, 'index'])
+        ->name('orders.index');
+
+    Route::get('/orders/{order}', [OrderController::class, 'show'])
+        ->name('orders.show');
+
+});
+
+Route::get('/terms-and-conditions', [PageController::class, 'termsAndConditions'])
+    ->name('terms-and-conditions');

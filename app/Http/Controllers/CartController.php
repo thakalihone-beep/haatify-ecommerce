@@ -54,7 +54,7 @@ class CartController extends Controller
                 'integer',
                 'min:1',
             ],
-
+            'buy_now' => 'nullable|boolean',
             'product_variation_id' => [
                 'nullable',
                 'integer',
@@ -191,6 +191,10 @@ class CartController extends Controller
                 'quantity' => $quantity,
                 'price' => $price,
             ]);
+        }
+
+        if ($request->boolean('buy_now')) {
+            return redirect()->route('checkout.index')->with('success', 'Product added to cart. Proceed to checkout.');
         }
 
         return redirect()

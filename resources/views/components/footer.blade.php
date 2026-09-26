@@ -135,7 +135,7 @@
                     </li>
 
                     <li>
-                        <a href="#"
+                        <a href="{{ route('terms-and-conditions') }}"
                            class="hover:text-white hover:underline">
                             Terms & Conditions
                         </a>
@@ -223,7 +223,7 @@
                     Privacy
                 </a>
 
-                <a href="#" class="hover:text-white">
+                <a href="{{ route('terms-and-conditions') }}" class="hover:text-white">
                     Terms
                 </a>
 
